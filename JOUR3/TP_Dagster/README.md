@@ -650,3 +650,42 @@ Même si ces code locations sont **isolées**, elles restent connectées via une
 
 🚀 **À retenir** : Les code locations permettent d'éviter les conflits entre équipes, de garantir l'évolutivité du projet et d'offrir une meilleure gestion des dépendances sans avoir besoin de multiplier les déploiements Dagster.
 
+---
+
+### Code locations dans Dagster UI
+
+Dans cette section, nous allons explorer comment visualiser et gérer les **code locations** dans l'interface **Dagster UI**.
+
+#### Visualiser les code locations
+
+1. **Accéder aux code locations** :
+   - Dans **Dagster UI**, cliquez sur **Deployments** dans la barre de navigation supérieure.
+   - Dans l'onglet **Code Locations**, vous verrez la liste des code locations disponibles, avec leur statut, la dernière mise à jour et d'autres informations.
+   
+2. **Nom des code locations** :
+   - Par défaut, une code location prend le nom du module chargé par Dagster. Dans notre cas, la code location est nommée **dagster_university**, car elle correspond au dossier principal du projet.
+
+#### Gestion des erreurs de chargement des code locations
+
+Si une erreur survient lors du chargement d'une code location, son statut apparaîtra comme **Failed**.
+
+1. **Identifier une erreur** :
+   - Dans l'onglet **Code Locations**, une code location en échec affichera le statut **Failed**.
+   - Cliquez sur **View Error** pour afficher les logs d'erreur et diagnostiquer le problème.
+
+#### Rechargement des définitions
+
+Lors de l'ajout ou de la modification de définitions dans votre projet, il peut être nécessaire de **rafraîchir la code location** pour que Dagster prenne en compte les nouvelles versions des fichiers.
+
+Vous pouvez recharger les définitions de deux manières :
+
+1. **Depuis l'onglet Deployments** :
+   - Accédez à **Deployments > Code Locations**.
+   - Cliquez sur le bouton **Reload** à côté de la code location concernée.
+
+2. **Depuis la page Global Asset Lineage** :
+   - Accédez à **Global Asset Lineage** dans Dagster UI.
+   - Cliquez sur **Reload definitions** pour mettre à jour toutes les définitions du projet.
+
+🚀 **À retenir** : Une code location centralise les définitions Dagster et doit être rechargée lorsqu’un asset est ajouté ou modifié afin que Dagster prenne en compte les mises à jour.
+
