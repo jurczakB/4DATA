@@ -1660,3 +1660,176 @@ class AdhocRequestConfig(Config):
 
 ✅ **Cette classe nous permettra de passer des configurations dynamiques aux matérialisations d'assets en fonction des demandes spécifiques des utilisateurs.**
 
+---
+
+### Création d'un asset déclenché par un capteur
+
+Maintenant que vous avez défini comment l'asset peut être matérialisé, créons l'asset de rapport à la demande.
+
+1. **Ajoutez les imports suivants à `requests.py` :**
+
+    ```python
+    from dagster import asset, Config
+    from dagster_duckdb import DuckDBResource
+    
+    import matplotlib.pyplot as plt
+    
+    from . import constants
+    ```
+
+2. **Créez un nouvel asset nommé `adhoc_request` avec les arguments suivants :**
+
+    - `config`, annoté avec `AdhocRequestConfig`.
+    - Dépendances sur les assets `taxi_zones` et `taxi_trips`.
+    - `database`, annoté avec `DuckDBResource` pour pouvoir interroger DuckDB.
+
+    ```python
+    @asset(
+        deps=["taxi_zones", "taxi_trips"]
+    )
+    def adhoc_request(config: AdhocRequestConfig, database: DuckDBResource) -> None:
+    ```
+
+3. **Générez le nom du fichier de sortie** en utilisant un template fourni dans `assets/constants.py`, en supprimant l'extension `.json` :
+
+    ```python
+    file_path = constants.REQUEST_DESTINATION_TEMPLATE_FILE_PATH.format(config.filename.split('.')[0])
+    ```
+
+4. **Écrivez une requête SQL** qui :
+    - Filtre les trajets qui n'ont pas commencé dans le borough spécifié.
+    - Agrège les données par jour de la semaine et heure du jour.
+
+    ```python
+    query = f"""
+      select
+        date_part('hour', pickup_datetime) as hour_of_day,
+        date_part('dayofweek', pickup_datetime) as day_of_week_num,
+        case date_part('dayofweek', pickup_datetime)
+          when 0 then 'Sunday'
+          when 1 then 'Monday'
+          when 2 then 'Tuesday'
+          when 3 then 'Wednesday'
+          when 4 then 'Thursday'
+          when 5 then 'Friday'
+          when 6 then 'Saturday'
+        end as day_of_week,
+        count(*) as num_trips
+      from trips
+      left join zones on trips.pickup_zone_id = zones.zone_id
+      where pickup_datetime >= '{config.start_date}'
+      and pickup_datetime < '{config.end_date}'
+      and pickup_zone_id in (
+        select zone_id
+        from zones
+        where borough = '{config.borough}'
+      )
+      group by 1, 2
+      order by 1, 2 asc
+    """
+    ```
+
+5. **Exécutez la requête dans DuckDB et stockez les résultats dans un DataFrame :**
+
+    ```python
+    with database.get_connection() as conn:
+        results = conn.execute(query).fetch_df()
+    ```
+
+6. **Générez une visualisation** avec Matplotlib pour afficher le nombre de trajets en fonction de l'heure et du jour de la semaine :
+
+    ```python
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    results_pivot = results.pivot(index="hour_of_day", columns="day_of_week", values="num_trips")
+    results_pivot.plot(kind="bar", stacked=True, ax=ax, colormap="viridis")
+    
+    ax.set_title(f"Number of trips by hour of day in {config.borough}, from {config.start_date} to {config.end_date}")
+    ax.set_xlabel("Hour of Day")
+    ax.set_ylabel("Number of Trips")
+    ax.legend(title="Day of Week")
+    
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    ```
+
+7. **Enregistrez le graphique sous forme de fichier image** en utilisant `file_path` :
+
+    ```python
+    plt.savefig(file_path)
+    plt.close(fig)
+    ```
+
+8. **Vérifiez que votre fichier `requests.py` ressemble à ceci :**
+
+    ```python
+    from dagster import Config, asset
+    from dagster_duckdb import DuckDBResource
+    
+    import matplotlib.pyplot as plt
+    
+    from . import constants
+    
+    class AdhocRequestConfig(Config):
+        filename: str
+        borough: str
+        start_date: str
+        end_date: str
+    
+    @asset(
+        deps=["taxi_zones", "taxi_trips"]
+    )
+    def adhoc_request(config: AdhocRequestConfig, database: DuckDBResource) -> None:
+        """
+          The response to an request made in the `requests` directory.
+          See `requests/README.md` for more information.
+        """
+    
+        file_path = constants.REQUEST_DESTINATION_TEMPLATE_FILE_PATH.format(config.filename.split('.')[0])
+    
+        query = f"""
+            select
+              date_part('hour', pickup_datetime) as hour_of_day,
+              date_part('dayofweek', pickup_datetime) as day_of_week_num,
+              case date_part('dayofweek', pickup_datetime)
+                when 0 then 'Sunday'
+                when 1 then 'Monday'
+                when 2 then 'Tuesday'
+                when 3 then 'Wednesday'
+                when 4 then 'Thursday'
+                when 5 then 'Friday'
+                when 6 then 'Saturday'
+              end as day_of_week,
+              count(*) as num_trips
+            from trips
+            left join zones on trips.pickup_zone_id = zones.zone_id
+            where pickup_datetime >= '{config.start_date}'
+            and pickup_datetime < '{config.end_date}'
+            and pickup_zone_id in (
+              select zone_id
+              from zones
+              where borough = '{config.borough}'
+            )
+            group by 1, 2
+            order by 1, 2 asc
+        """
+    
+        with database.get_connection() as conn:
+            results = conn.execute(query).fetch_df()
+    
+        fig, ax = plt.subplots(figsize=(10, 6))
+        
+        results_pivot = results.pivot(index="hour_of_day", columns="day_of_week", values="num_trips")
+        results_pivot.plot(kind="bar", stacked=True, ax=ax, colormap="viridis")
+        
+        ax.set_title(f"Number of trips by hour of day in {config.borough}, from {config.start_date} to {config.end_date}")
+        ax.set_xlabel("Hour of Day")
+        ax.set_ylabel("Number of Trips")
+        ax.legend(title="Day of Week")
+        
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        
+        plt.savefig(file_path)
+        plt.close(fig)
+    ```
