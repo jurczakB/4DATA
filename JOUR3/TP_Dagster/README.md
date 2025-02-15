@@ -1617,3 +1617,46 @@ Pour répondre à ces besoins, nous allons :
 1. **Écrire une logique permettant de personnaliser la matérialisation des assets en fonction des requêtes**.
 2. **Créer un nouvel asset qui génère un rapport personnalisé par requête**.
 3. **Ajouter un capteur pour surveiller les nouvelles requêtes et déclencher l'analyse automatiquement**.
+
+
+---
+
+### Configuration de la création d'assets
+
+La configuration de la création d'assets n'est pas spécifique aux capteurs, mais lorsqu'on matérialise des assets, il peut être nécessaire de personnaliser certains aspects de la logique en fonction du contexte d'exécution. Par exemple, personnaliser un email en fonction du destinataire ou adapter une analyse en fonction d'une plage de dates.
+
+Dans notre cas, nous voulons personnaliser la matérialisation d'un asset en fonction du **quartier et de la plage de dates** spécifiés par l'utilisateur dans sa requête.
+
+Ces configurations sont généralement ajoutées **au niveau de l'exécution** et peuvent être utilisées dans les plannings et capteurs. De plus, elles peuvent être configurées manuellement via l'interface utilisateur de Dagster lors du lancement d'une exécution.
+
+### Implémentation de la configuration personnalisée
+
+1. **Créer un fichier `requests.py`** dans le dossier `assets`.
+2. **Ajouter l'import suivant** en haut du fichier :
+
+    ```python
+    from dagster import Config
+    ```
+
+    Cet import permet d'utiliser `Config` comme classe de base pour la configuration personnalisée.
+
+3. **Définir une nouvelle classe `AdhocRequestConfig`** qui contiendra les informations suivantes :
+    - `filename` : Nom du fichier JSON contenant la requête.
+    - `borough` : Le quartier de New York à analyser (**Manhattan, Brooklyn, Queens, Bronx, Staten Island**).
+    - `start_date` : Début de la plage de dates demandée (**format YYYY-MM-DD**).
+    - `end_date` : Fin de la plage de dates demandée (**format YYYY-MM-DD**).
+
+Le fichier `requests.py` final devrait ressembler à ceci :
+
+```python
+from dagster import Config
+
+class AdhocRequestConfig(Config):
+    filename: str
+    borough: str
+    start_date: str
+    end_date: str
+```
+
+✅ **Cette classe nous permettra de passer des configurations dynamiques aux matérialisations d'assets en fonction des demandes spécifiques des utilisateurs.**
+
