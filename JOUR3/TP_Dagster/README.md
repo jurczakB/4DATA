@@ -1455,3 +1455,49 @@ conn.execute("drop table trips;")
 
 ✅ **Modifiez `taxi_trips` pour appliquer cette partition et validez votre implémentation dans Dagster UI !**
 
+---
+
+
+### Création d'un job planifié avec partitions
+
+Dans la section précédente, vous avez créé le job `trip_update_job` qui met à jour la plupart de vos assets. Ce job était programmé pour s'exécuter le cinquième jour de chaque mois à minuit.
+
+Maintenant que les assets pertinents sont partitionnés, la planification peut être modifiée afin de ne récupérer que les nouvelles données du dernier mois au lieu de rafraîchir l'intégralité des assets. C'est une **meilleure pratique** qui optimise les ressources et réduit le temps de calcul.
+
+Actuellement, `trip_update_job` dans `jobs/__init__.py` doit ressembler à ceci :
+
+```python
+trip_update_job = define_asset_job(
+    name="trip_update_job",
+    selection=AssetSelection.all() - AssetSelection.assets(["trips_by_week"]),
+)
+```
+
+### Ajout de la partition au job
+
+1. **Importer la partition mensuelle** depuis le fichier partitions :
+
+    ```python
+    from ..partitions import monthly_partition
+    ```
+
+2. **Ajouter le paramètre `partitions_def`** dans le job pour qu'il utilise `monthly_partition` :
+
+    ```python
+    partitions_def=monthly_partition,
+    ```
+
+Après modifications, le job doit ressembler à ceci :
+
+```python
+from dagster import define_asset_job, AssetSelection
+from ..partitions import monthly_partition
+
+trips_by_week = AssetSelection.assets("trips_by_week")
+
+trip_update_job = define_asset_job(
+    name="trip_update_job",
+    partitions_def=monthly_partition, # partitions ajoutées ici
+    selection=AssetSelection.all() - trips_by_week
+)
+```
