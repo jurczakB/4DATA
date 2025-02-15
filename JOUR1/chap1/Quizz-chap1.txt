@@ -1,0 +1,207 @@
+Quiz : Évaluation des connaissances sur les pipelines de données
+Instructions :
+Ce quiz comprend 25 questions.
+Chaque question comporte 3 ou 4 propositions.
+Une ou plusieurs réponses peuvent être correctes (indiqué après chaque question).
+Le quiz est progressif : les premières questions sont plus simples et deviennent progressivement plus complexes.
+Partie 1 : Questions fondamentales sur les pipelines de données (Q1 - Q10)
+Qu'est-ce qu'un pipeline de données ?
+
+A. Un processus automatisé pour déplacer et transformer des données.
+B. Une base de données relationnelle.
+C. Un tableau de bord interactif.
+D. Une méthode pour sauvegarder les données sur le cloud.
+Réponse : A
+
+Que signifie ETL dans le contexte des pipelines de données ?
+
+A. Extract, Transform, Load
+B. Extract, Transfer, Load
+C. Evaluate, Transfer, Load
+D. Extract, Test, Load
+Réponse : A
+
+Quelle est la principale différence entre ETL et ELT ?
+
+A. L'ordre dans lequel les données sont transformées et chargées.
+B. ELT est utilisé pour les bases de données locales uniquement.
+C. ETL transforme les données après le chargement dans le data warehouse.
+D. ELT est plus adapté aux pipelines modernes basés sur le cloud.
+Réponse : A, D
+
+Quel type de données peut être géré par une approche ELT ?
+
+A. Structurées uniquement
+B. Semi-structurées uniquement
+C. Structurées, semi-structurées et non structurées
+D. Non structurées uniquement
+Réponse : C
+
+Pourquoi utiliser des pipelines de données ?
+
+A. Pour automatiser le traitement des données.
+B. Pour faciliter l'analyse des données en temps réel.
+C. Pour sécuriser l'accès aux bases de données.
+D. Pour gérer des volumes de données croissants.
+Réponse : A, B, D
+
+Qu'est-ce qu'un DAG dans un pipeline de données ?
+
+A. Un graphe acyclique dirigé qui définit la séquence des tâches.
+B. Une méthode de stockage des données.
+C. Une technique de transformation de données en temps réel.
+D. Un outil de visualisation des flux de données.
+Réponse : A
+
+Quel outil est typiquement utilisé pour orchestrer des pipelines de données ?
+
+A. Apache Airflow
+B. Tableau
+C. Google BigQuery
+D. dbt (Data Build Tool)
+Réponse : A
+
+Quels types de données peuvent être transformés dans un pipeline ?
+
+A. Données brutes issues d'API
+B. Données semi-structurées comme JSON
+C. Données relationnelles comme MySQL
+D. Toutes les réponses ci-dessus
+Réponse : D
+
+Quel est le rôle principal de la phase d'extraction dans un pipeline de données ?
+
+A. Collecter les données brutes depuis diverses sources.
+B. Nettoyer les données pour les rendre exploitables.
+C. Charger les données dans un système cible.
+D. Exécuter des analyses en temps réel.
+Réponse : A
+
+Quel outil est utilisé pour appliquer des transformations SQL dans un entrepôt de données ?
+
+A. Apache Airflow
+B. Google Data Studio
+C. dbt (Data Build Tool)
+D. Prometheus
+Réponse : C
+
+Partie 2 : Questions intermédiaires sur les technologies et mises en pratique (Q11 - Q20)
+Quel est l’avantage principal d’utiliser ELT par rapport à ETL ?
+
+A. Rapidité pour les grands volumes de données.
+B. Transformation dans un entrepôt de données hautement optimisé.
+C. Facilité d’intégration avec les bases de données locales.
+D. Moins d’étapes initiales de configuration.
+Réponse : A, B, D
+
+Quelle technologie est adaptée pour le stockage et la transformation des données à grande échelle ?
+
+A. Google BigQuery
+B. SQLite
+C. Apache Hive
+D. Excel
+Réponse : A, C
+
+Quelle serait la méthode idéale pour surveiller les erreurs dans un pipeline ?
+
+A. Utiliser Prometheus pour le monitoring.
+B. Examiner manuellement chaque étape.
+C. Utiliser un orchestrateur comme Airflow pour suivre les logs.
+D. Configurer des alertes automatiques.
+Réponse : A, C, D
+
+Quelle étape du pipeline serait affectée si les données brutes contiennent des valeurs manquantes ?
+
+A. Extraction
+B. Transformation
+C. Chargement
+D. Visualisation
+Réponse : B
+
+Quels sont des exemples de sources de données pour un pipeline moderne ?
+
+A. Fichiers CSV
+B. Bases de données relationnelles comme MySQL
+C. API REST comme Facebook Ads
+D. Toutes les réponses ci-dessus
+Réponse : D
+
+Dans quel scénario devriez-vous utiliser ETL au lieu d’ELT ?
+
+A. Lorsque les données doivent être nettoyées avant d’être chargées.
+B. Lorsque les données sont structurées et proviennent de bases traditionnelles.
+C. Lorsque le système cible ne prend pas en charge de grandes transformations.
+D. Lorsque vous avez besoin d’analyses avancées sur des données brutes.
+Réponse : A, B, C
+
+Pourquoi choisir dbt dans un pipeline ELT ?
+
+A. Pour transformer les données directement dans le data warehouse.
+B. Pour charger les données brutes dans une base locale.
+C. Pour surveiller les performances du pipeline.
+D. Pour créer des tableaux de bord visuels.
+Réponse : A
+
+Quel est un avantage clé de l'utilisation d'un orchestrateur comme Airflow ?
+
+A. Détection et gestion des échecs dans le pipeline.
+B. Automatisation de tâches répétitives.
+C. Création de visualisations interactives.
+D. Exécution de transformations SQL à la demande.
+Réponse : A, B
+
+Quels outils seraient pertinents pour analyser les données transformées ?
+
+A. Tableau
+B. Power BI
+C. dbt
+D. Google Data Studio
+Réponse : A, B, D
+
+Quel langage est essentiel pour manipuler les données dans un pipeline de données ?
+
+A. Python
+B. SQL
+C. JavaScript
+D. HTML
+Réponse : A, B
+
+Partie 3 : Questions avancées et mises en situations (Q21 - Q25)
+Vous avez besoin d'intégrer des données publicitaires provenant d'une API, que faites-vous ?
+
+A. Utilisez un script Python avec requests pour extraire les données.
+B. Transformez immédiatement les données avant de les charger.
+C. Chargez les données brutes dans un data warehouse.
+D. Configurez dbt pour automatiser l’extraction.
+Réponse : A, C
+
+Dans une pipeline ELT, où se produit principalement la transformation des données ?
+
+A. Dans le système source.
+B. Dans l’entrepôt de données cible.
+C. Pendant l’extraction.
+D. Avant le chargement.
+Réponse : B
+
+Quelle est une bonne pratique pour automatiser un pipeline de données ?
+
+A. Orchestrer les tâches avec un DAG.
+B. Effectuer les transformations manuellement.
+C. Configurer des tests de qualité sur les données transformées.
+D. Utiliser un seul outil pour tout gérer.
+Réponse : A, C
+
+Quel outil peut être utilisé pour monitorer la performance d'un pipeline ?
+
+A. Prometheus
+B. Grafana
+C. Tableau
+D. Airflow
+Réponse : A, B, D
+
+Pour un pipeline multi-sources, quel ordre serait correct ?
+
+A. Collecte des données → Transformation → Visualisation → Chargement
+B. Collecte des données → Chargement → Transformation → Visualisation
+C. Transformation → Collecte des données → Visualisation → Chargement
+D. Visualisation → Chargement → Transformation → Collecte des données

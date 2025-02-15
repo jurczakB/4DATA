@@ -1,0 +1,10 @@
+2025-01-26 15:38:01,331 - INFO - Démarrage du pipeline ETL
+2025-01-26 15:38:01,331 - INFO - Début de l'étape d'extraction
+2025-01-26 15:38:21,698 - INFO - Démarrage du pipeline ETL
+2025-01-26 15:38:21,699 - INFO - Début de l'étape d'extraction
+2025-01-26 15:38:21,721 - INFO - Extraction terminée, 2823 lignes chargées.
+2025-01-26 15:38:21,721 - INFO - Début de l'étape de transformation
+2025-01-26 15:38:21,738 - INFO - Transformation terminée, 116 lignes agrégées.
+2025-01-26 15:38:21,738 - INFO - Début de l'étape de chargement
+2025-01-26 15:38:21,792 - INFO - Chargement terminé avec succès dans la base SQLite.
+2025-01-26 15:38:21,792 - INFO - Pipeline ETL exécuté avec succès
