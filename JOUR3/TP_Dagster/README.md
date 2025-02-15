@@ -1069,3 +1069,11 @@ trip_update_schedule = ScheduleDefinition(
   - Utilise l'expression cron `0 0 5 * *`, qui exécute le job **chaque 5 du mois à minuit**.
 
 🚀 **Votre schedule est maintenant défini !** Passez à la suite pour l'ajouter à Dagster UI.
+
+### Pratique : Création d'un `weekly_update_schedule`
+
+Pour mettre en pratique ce que vous avez appris, ajoutez un **schedule** dans `schedules/__init__.py` qui :
+
+- **Se nomme `weekly_update_schedule`**.
+- **Matérialise l'asset `trips_by_week`**.
+- **S'exécute chaque lundi à minuit**.
