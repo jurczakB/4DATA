@@ -78,52 +78,62 @@ Naviguez vers **[localhost:3000](http://localhost:3000)**, où vous devriez voir
 
 ---
 
-## Structure des fichiers du projet
+## Définition de votre premier asset
 
-Maintenant que vous avez créé le projet Dagster, voici un aperçu des fichiers qu'il contient :
+Dans ce cours, vous utiliserez les données de **NYC OpenData** pour analyser les trajets en taxi à New York. Le premier asset que vous allez définir utilise les données de **TLC Trip Record Data**, qui contient les enregistrements de trajets pour plusieurs types de véhicules. Nous nous concentrerons sur les taxis jaunes.
 
-```
-.
-├── README.md
-├── dagster_university/
-│   ├── assets/
-│   │   ├── __init__.py
-│   │   ├── constants.py
-│   │   ├── metrics.py
-│   │   └── trips.py
-│   ├── jobs/
-│   ├── partitions/
-│   ├── resources/
-│   ├── schedules/
-│   ├── sensors/
-│   └── __init__.py
-├── dagster_university_tests
-├── data/
-│   ├── outputs/
-│   ├── raw/
-│   ├── requests/
-│   │   └── README.md
-│   └── staging/
-├── .env
-├── .env.example
-├── pyproject.toml
-├── setup.cfg
-└── setup.py
+Votre premier asset, nommé `taxi_trips_file`, va récupérer les données des taxis jaunes pour **mars 2023** et les enregistrer localement.
+
+1. **Ouvrir le fichier `assets/trips.py`** dans votre projet Dagster.
+2. **Vérifier que les imports suivants existent déjà** en haut du fichier :
+
+```python
+import requests
+from . import constants
 ```
 
-### Explication des fichiers principaux
+3. **Définir une fonction qui récupère les données et les sauvegarde localement** :
 
-| Fichier/Répertoire | Contexte | Description |
-|--------------------|----------|-------------|
-| `README.md` | Python | Une description et un guide de démarrage du projet Dagster. |
-| `dagster_university/` | Dagster | Contient le code Dagster, y compris les assets et capteurs. |
-| `dagster_university/__init__.py` | Dagster | Fichier définissant la structure du projet. |
-| `dagster_university/assets/constants.py` | Dagster U | Contient des constantes utilisées dans le projet. |
-| `dagster_university_tests/` | Dagster | Contient les tests unitaires pour le projet. |
-| `data/` | Dagster U | Contient les données manipulées par le projet. |
-| `.env` | Python | Fichier contenant les variables d'environnement. |
-| `pyproject.toml` | Python | Définit les métadonnées du projet et ses dépendances. |
-| `setup.py` | Python | Script pour la gestion des dépendances du projet. |
-| `setup.cfg` | Python | Contient les configurations par défaut pour `setup.py`. |
+```python
+def taxi_trips_file() -> None:
+    """
+    Récupère les fichiers Parquet bruts des trajets en taxi.
+    Sourced from the NYC Open Data portal.
+    """
+    month_to_fetch = '2023-03'
+    raw_trips = requests.get(
+        f"https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_{month_to_fetch}.parquet"
+    )
 
-Pour plus d'informations sur ces fichiers et leur rôle dans Dagster, consultez la [documentation officielle](https://docs.dagster.io/).
+    with open(constants.TAXI_TRIPS_TEMPLATE_FILE_PATH.format(month_to_fetch), "wb") as output_file:
+        output_file.write(raw_trips.content)
+```
+
+4. **Transformer cette fonction en un asset Dagster** :
+
+    - **Importer `asset` depuis la bibliothèque Dagster** :
+
+    ```python
+    from dagster import asset
+    ```
+
+    - **Ajouter le décorateur `@asset` avant la fonction** :
+
+    ```python
+    @asset
+    def taxi_trips_file() -> None:
+        """
+        Récupère les fichiers Parquet bruts des trajets en taxi.
+        """
+        month_to_fetch = '2023-03'
+        raw_trips = requests.get(
+            f"https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_{month_to_fetch}.parquet"
+        )
+
+        with open(constants.TAXI_TRIPS_TEMPLATE_FILE_PATH.format(month_to_fetch), "wb") as output_file:
+            output_file.write(raw_trips.content)
+    ```
+
+C'est tout ! 🎉 Vous venez de créer votre premier **asset Dagster**. En utilisant le décorateur `@asset`, vous pouvez facilement transformer une fonction Python en un asset Dagster.
+
+ℹ️ **Note sur `-> None`** : Il s'agit d'une **annotation de type** en Python indiquant que la fonction ne retourne rien. L'utilisation des annotations de type est fortement recommandée pour rendre le code plus lisible et compréhensible.
