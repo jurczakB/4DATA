@@ -943,3 +943,33 @@ Les assets suivants utilisent la base de données **DuckDB** :
 - `trips_by_week`
 
 Mettez à jour ces assets pour qu'ils utilisent la resource **DuckDBResource** au lieu d'une connexion directe à la base de données.
+
+---
+
+### Analyse de l'utilisation des resources via Dagster UI
+
+Maintenant que vos assets utilisent la resource `database`, vous pouvez analyser son utilisation dans Dagster UI.
+
+#### Accéder à l'onglet Resources
+
+1. **Ouvrez Dagster UI**.
+2. **Cliquez sur "Deployment"**, puis sélectionnez la code location **dagster_university**.
+3. **Accédez à l'onglet "Resources"**.
+4. Vous devriez voir que la colonne **Uses** affiche désormais `4`, indiquant que quatre assets utilisent la resource `database`.
+5. Dans la colonne **Name**, cliquez sur `database`.
+
+#### Affichage des détails d'une resource
+
+- Cette page contient des informations détaillées sur la resource, y compris son type et sa configuration.
+
+#### Visualisation de l'utilisation des resources
+
+1. **Cliquez sur l'onglet "Uses"** pour voir quels assets utilisent cette resource.
+2. Cette vue est essentielle pour comprendre quelles resources sont disponibles et comment elles sont exploitées.
+
+#### Cas d'utilisation courants
+
+- **Identifier les impacts potentiels d'une migration de base de données**.
+- **Analyser l'augmentation des coûts de service** et retracer leur origine.
+
+🚀 **En utilisant cette interface, vous obtenez une vision claire de l'usage des resources dans vos pipelines Dagster.**
