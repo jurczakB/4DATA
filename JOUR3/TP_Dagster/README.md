@@ -225,3 +225,20 @@ Pour mettre en pratique ce que vous avez appris, créez un nouvel asset dans `tr
 
 Une fois cet asset créé et ajouté à votre projet, vous pourrez le matérialiser de la même manière que l'asset précédent en utilisant l'interface **Dagster UI**.
 
+---
+
+## Création d'un pipeline de données
+
+Jusqu'ici, nous avons vu ce qu'est un asset et comment en créer dans Dagster. Maintenant, nous allons étendre votre projet Dagster pour construire un pipeline de données.
+
+Les pipelines de données sont une suite d'événements produisant des assets. Dagster permet de créer efficacement ces pipelines tout en gérant plusieurs assets interdépendants.
+
+Vous allez maintenant construire un pipeline complet qui :
+
+- **Charge les fichiers téléchargés dans une base de données**.
+- **Combine et agrège les données** pour générer des métriques sur les trajets en taxi.
+- **Visualise ces métriques et enregistre un rapport**.
+
+Pendant ce processus, vous apprendrez à définir des dépendances entre assets pour structurer vos pipelines efficacement.
+
+
