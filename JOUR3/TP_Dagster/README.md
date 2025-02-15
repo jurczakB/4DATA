@@ -2009,3 +2009,30 @@ Comme pour les autres définitions de Dagster, la dernière étape consiste à a
 
 ✅ **Votre sensor `adhoc_request_sensor` est maintenant enregistré et prêt à être utilisé dans Dagster !**
 
+---
+
+### Sensors dans l'interface Dagster
+
+Maintenant que le capteur est construit, explorons son affichage dans l'interface utilisateur de Dagster.
+
+#### Étape 1 : Vérification de l'asset `adhoc_request`
+
+- Accédez à la page **Global Asset Lineage**.
+- Vous devriez voir le nouvel asset `adhoc_request`.
+- **Remarque** : Si l'asset n'apparaît pas, cliquez d'abord sur **Reload definitions**.
+
+#### Étape 2 : Vérification du capteur
+
+- Accédez à **Overview > Sensors**.
+- Dans cet onglet, vous verrez `adhoc_request_sensor`.
+- **Remarque** : Par défaut, tous les capteurs et plannings sont désactivés lorsqu'ils sont chargés pour la première fois. Vous verrez donc que le bouton **Running** est désactivé.
+
+#### Étape 3 : Consultation des détails du capteur
+
+- Cliquez sur `adhoc_request_sensor` pour ouvrir sa page de détails.
+- Cette page fournit des informations détaillées sur le capteur, notamment :
+  - Les jobs qui l’utilisent
+  - L'historique des exécutions (ticks et runs)
+  - D'autres paramètres liés à son fonctionnement
+
+✅ **Votre capteur est maintenant visible dans Dagster !** Nous verrons ensuite comment l'activer et l'exécuter automatiquement.
