@@ -1180,3 +1180,38 @@ defs = Definitions(
     schedules=all_schedules,
 )
 ```
+---
+
+### Visualisation des Jobs et Schedules dans Dagster UI
+
+Comme les autres définitions Dagster, les jobs et schedules peuvent être visualisés et gérés dans **Dagster UI**.
+
+En plus de consulter et gérer ces éléments dans l'interface, l'exécution de `dagster dev` lance également le **dagster-daemon**. Ce processus surveille l'horloge pour exécuter les jobs planifiés et activer les capteurs.
+
+#### Vérification des Jobs
+
+1. **Rechargez les définitions** dans Dagster UI avant de continuer.
+2. Accédez aux jobs en cliquant sur **Overview > Jobs**, ou via **Deployment > Code location > Jobs**.
+3. La table affichera les informations suivantes :
+   - **Nom** du job
+   - **Schedules/Sensors** attachés au job
+   - **Dernière exécution**
+   - **Historique des exécutions**
+
+En sélectionnant un job, vous pourrez voir son **graphe des assets**.
+
+#### Vérification des Schedules
+
+1. Accédez aux schedules en cliquant sur **Overview > Schedules**, ou via **Deployment > Code location > Schedules**.
+2. La table affichera les détails suivants :
+   - **Nom du schedule**
+   - **Fréquence d'exécution** (ex. : mensuel, hebdomadaire...)
+   - **Statut (activé/désactivé)**
+   - **Dernier tick et dernière exécution**
+
+#### Gestion des Schedules
+
+- **Activation/Désactivation** : utilisez le bouton toggle à côté du nom du schedule.
+- **Tester un schedule** : cliquez sur **Test Schedule** et sélectionnez un moment de simulation avant de cliquer sur **Évaluer**.
+
+🚀 **Avec ces outils, vous avez maintenant une gestion complète des jobs et schedules dans Dagster UI !**
