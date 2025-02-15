@@ -75,3 +75,55 @@ dagster dev
 Naviguez vers **[localhost:3000](http://localhost:3000)**, où vous devriez voir l'interface utilisateur de Dagster.
 
 💡 **Remarque** : La commande `dagster dev` exécutera Dagster en continu jusqu'à ce que vous l'arrêtiez. Pour arrêter le processus en cours d'exécution, utilisez **Control + C** dans le terminal.
+
+---
+
+## Structure des fichiers du projet
+
+Maintenant que vous avez créé le projet Dagster, voici un aperçu des fichiers qu'il contient :
+
+```
+.
+├── README.md
+├── dagster_university/
+│   ├── assets/
+│   │   ├── __init__.py
+│   │   ├── constants.py
+│   │   ├── metrics.py
+│   │   └── trips.py
+│   ├── jobs/
+│   ├── partitions/
+│   ├── resources/
+│   ├── schedules/
+│   ├── sensors/
+│   └── __init__.py
+├── dagster_university_tests
+├── data/
+│   ├── outputs/
+│   ├── raw/
+│   ├── requests/
+│   │   └── README.md
+│   └── staging/
+├── .env
+├── .env.example
+├── pyproject.toml
+├── setup.cfg
+└── setup.py
+```
+
+### Explication des fichiers principaux
+
+| Fichier/Répertoire | Contexte | Description |
+|--------------------|----------|-------------|
+| `README.md` | Python | Une description et un guide de démarrage du projet Dagster. |
+| `dagster_university/` | Dagster | Contient le code Dagster, y compris les assets et capteurs. |
+| `dagster_university/__init__.py` | Dagster | Fichier définissant la structure du projet. |
+| `dagster_university/assets/constants.py` | Dagster U | Contient des constantes utilisées dans le projet. |
+| `dagster_university_tests/` | Dagster | Contient les tests unitaires pour le projet. |
+| `data/` | Dagster U | Contient les données manipulées par le projet. |
+| `.env` | Python | Fichier contenant les variables d'environnement. |
+| `pyproject.toml` | Python | Définit les métadonnées du projet et ses dépendances. |
+| `setup.py` | Python | Script pour la gestion des dépendances du projet. |
+| `setup.cfg` | Python | Contient les configurations par défaut pour `setup.py`. |
+
+Pour plus d'informations sur ces fichiers et leur rôle dans Dagster, consultez la [documentation officielle](https://docs.dagster.io/).
