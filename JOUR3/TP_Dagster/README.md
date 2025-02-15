@@ -1572,3 +1572,12 @@ Dans le graphe des assets, cliquez sur l'asset `taxi_trips` et ouvrez-le dans l'
 
 Sélectionnez `2023-03-01` pour voir une partition spécifique. Vous pourrez alors consulter **les informations spécifiques à cette partition**, y compris son lien avec les données sources (`taxi_trips_file`).
 
+---
+
+### Introduction aux capteurs dans Dagster
+
+Précédemment, vous avez écrit un schedule pour exécuter vos pipelines tous les mois. L'utilisation de schedules n'est qu'une des nombreuses manières de déclencher la matérialisation des assets dans Dagster.
+
+Les exécutions basées sur des événements sont courantes dans la réalité. Prenons l'exemple de notre boulangerie : nous recevons des livraisons d'ingrédients et devons les déplacer en cuisine. De la même manière, les pipelines de données doivent parfois réagir à des événements externes.
+
+Dans Dagster, vous pouvez utiliser **les capteurs (sensors)** pour automatiser vos pipelines et les rendre réactifs à ces événements.
