@@ -689,3 +689,28 @@ Vous pouvez recharger les définitions de deux manières :
 
 🚀 **À retenir** : Une code location centralise les définitions Dagster et doit être rechargée lorsqu’un asset est ajouté ou modifié afin que Dagster prenne en compte les mises à jour.
 
+---
+
+### Aperçu des Resources
+
+Précédemment, nous avons exploré les assets, la manière dont ils s'articulent pour former un pipeline de données et comment les exécuter pour les matérialiser.
+
+L'objectif de Dagster est d'offrir une **vue unifiée** sur tous les pipelines de données d'une organisation. Pour y parvenir, Dagster doit être capable d'interagir avec différents services et systèmes utilisés dans ces pipelines, comme le stockage cloud ou les entrepôts de données. Dans cette section, nous allons voir comment accomplir cela en appliquant les meilleures pratiques d'ingénierie logicielle.
+
+#### Le principe DRY (Don't Repeat Yourself)
+
+Une **bonne pratique** essentielle en développement logiciel est le principe **DRY (Don't Repeat Yourself)**. Ce principe recommande d'éviter la redondance et d'écrire un code qui soit **réutilisable** et **centralisé** plutôt que dupliqué à plusieurs endroits.
+
+En appliquant ce principe à Dagster, on réduit le nombre d'erreurs potentielles, on améliore la lisibilité du code et on facilite l'observabilité des processus et des assets définis.
+
+#### Tester dans l'environnement de développement
+
+À mesure que les pipelines de données deviennent plus complexes, il devient essentiel de tester les modifications avant leur déploiement en production. Une difficulté en ingénierie des données est que le code et les environnements sont souvent **étroitement couplés**, rendant difficile la validation des changements sans impacter les systèmes en production.
+
+Avec Dagster, il est possible de :
+
+- **Utiliser une base de données locale** au lieu de la base de production.
+- **Représenter différemment les connexions externes** selon l'environnement (développement, test, production).
+- **Créer une réplique d’un environnement de production** en développement afin de tester les modifications sans risques.
+
+🚀 **À retenir** : En appliquant ces bonnes pratiques, vous rendez vos pipelines plus robustes, plus lisibles et plus faciles à maintenir.
