@@ -210,3 +210,18 @@ Si un asset échoue lors de sa matérialisation, vous pouvez identifier la cause
 
 Ces étapes vous permettront de comprendre comment utiliser les logs et les outils de Dagster pour diagnostiquer et corriger les erreurs efficacement.
 
+---
+
+## Création d'un asset taxi_zones_file
+
+Pour mettre en pratique ce que vous avez appris, créez un nouvel asset dans `trips.py` qui :
+
+- **Est nommé `taxi_zones_file`**, qui contiendra un identifiant unique et le nom de chaque zone de taxi à New York.
+- **Utilise la bibliothèque `requests`** pour récupérer les données depuis l'URL suivante :
+  
+  `https://community-engineering-artifacts.s3.us-west-2.amazonaws.com/dagster-university/data/taxi_zones.csv`
+  
+- **Stocke les données sous forme de fichier CSV** dans `data/raw/taxi_zones.csv`. Le chemin est défini dans `constants.TAXI_ZONES_FILE_PATH`.
+
+Une fois cet asset créé et ajouté à votre projet, vous pourrez le matérialiser de la même manière que l'asset précédent en utilisant l'interface **Dagster UI**.
+
