@@ -137,3 +137,35 @@ def taxi_trips_file() -> None:
 C'est tout ! 🎉 Vous venez de créer votre premier **asset Dagster**. En utilisant le décorateur `@asset`, vous pouvez facilement transformer une fonction Python en un asset Dagster.
 
 ℹ️ **Note sur `-> None`** : Il s'agit d'une **annotation de type** en Python indiquant que la fonction ne retourne rien. L'utilisation des annotations de type est fortement recommandée pour rendre le code plus lisible et compréhensible.
+
+
+---
+
+## Matérialisation de votre asset
+
+Une fois votre asset défini dans le code, l'étape suivante consiste à le **matérialiser**. Lorsqu'un asset est matérialisé, Dagster exécute la fonction associée et enregistre le résultat dans un stockage, comme un entrepôt de données.
+
+### Exécution de la matérialisation via l'interface Dagster
+
+Si vous n'avez pas encore l'interface **Dagster UI** en cours d'exécution, démarrez-la en exécutant la commande suivante à la racine de votre projet Dagster :
+
+```sh
+dagster dev
+```
+
+Puis, accédez à **[localhost:3000](http://localhost:3000)** dans votre navigateur.
+
+1. **Cliquez sur "Assets" dans la barre de navigation supérieure**. Vous verrez la liste des assets disponibles dans le projet.
+2. **Si la page est vide, cliquez sur "Reload definitions"** pour recharger les définitions des assets.
+3. **Cliquez sur "View global asset lineage"** pour visualiser la hiérarchie de votre asset.
+4. **Cliquez sur le bouton "Materialize"** pour exécuter la fonction de l'asset et générer le fichier de données.
+5. **Une boîte de notification violette apparaîtra**, indiquant que l'exécution a démarré avec succès.
+6. **Une fois la matérialisation terminée**, accédez au répertoire `data/raw/` dans votre projet et vérifiez la présence du fichier généré :
+
+```sh
+ls data/raw/taxi_trips_2023-03.parquet
+```
+
+💡 **Remarque** : Le téléchargement du fichier peut prendre quelques instants.
+
+C'est tout ! 🎉 Vous avez maintenant **matérialisé votre premier asset** avec Dagster !
