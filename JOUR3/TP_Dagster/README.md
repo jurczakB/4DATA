@@ -186,3 +186,27 @@ Maintenant que vous avez matérialisé un asset, il est essentiel de savoir comm
 
 Si votre exécution avait échoué, cette page vous aiderait à diagnostiquer la cause et à ajuster votre code en conséquence. Parcourez la afin de vous familiariser avec l'UI et un potentiel débuggage...
 
+---
+
+## Dépannage des exécutions échouées
+
+Si un asset échoue lors de sa matérialisation, vous pouvez identifier la cause et corriger l'erreur en suivant ces étapes :
+
+1. **Déclencher une erreur intentionnelle**
+   - Modifiez `assets/trips.py` en commentant l'importation de `constants`.
+   - Lancez la matérialisation dans **Dagster UI** et observez l'échec.
+
+2. **Analyser les logs d'exécution**
+   - Ouvrez les **Run details** et repérez le statut **Failure**.
+   - Identifiez l'étape en échec via le message d'erreur dans les logs.
+
+3. **Corriger l'erreur**
+   - Réactivez l'importation de `constants` dans `trips.py` et enregistrez.
+   - Fermez la fenêtre d'erreur dans **Dagster UI**.
+
+4. **Relancer l'exécution**
+   - Cliquez sur **Re-execute all** dans **Dagster UI** pour relancer toutes les étapes.
+   - Vérifiez que la matérialisation aboutit avec succès.
+
+Ces étapes vous permettront de comprendre comment utiliser les logs et les outils de Dagster pour diagnostiquer et corriger les erreurs efficacement.
+
