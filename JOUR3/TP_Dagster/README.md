@@ -1581,3 +1581,39 @@ Précédemment, vous avez écrit un schedule pour exécuter vos pipelines tous l
 Les exécutions basées sur des événements sont courantes dans la réalité. Prenons l'exemple de notre boulangerie : nous recevons des livraisons d'ingrédients et devons les déplacer en cuisine. De la même manière, les pipelines de données doivent parfois réagir à des événements externes.
 
 Dans Dagster, vous pouvez utiliser **les capteurs (sensors)** pour automatiser vos pipelines et les rendre réactifs à ces événements.
+
+---
+
+### Qu'est-ce qu'un capteur ?
+
+Les capteurs (**sensors**) sont un moyen de surveiller un événement spécifique et de déclencher des exécutions en fonction de celui-ci. Ils fonctionnent en exécutant périodiquement une logique pour déterminer si une exécution doit être lancée. Par défaut, les capteurs dans Dagster interrogent toutes les **30 secondes**.
+
+Les capteurs sont particulièrement utiles pour **déclencher la matérialisation d'un asset après qu'un événement se soit produit**, par exemple :
+
+- L'arrivée d'un nouveau fichier dans un emplacement spécifique (ex: Amazon S3).
+- La matérialisation d'un autre asset.
+- La libération d'un slot de travail dans un système externe.
+
+### Contexte de cette section
+
+Dans cette section, nous supposons un scénario hypothétique où les parties prenantes de vos rapports sur les trajets de taxi effectuent régulièrement des analyses exploratoires sur le nombre de trajets dans certains quartiers (ex: Manhattan ou Brooklyn) à des plages horaires spécifiques.
+
+Elles cherchent à répondre à des questions comme :
+
+> *« Comment les fêtes de fin d'année affectent-elles le trafic aux heures de pointe à Manhattan ? »*
+
+Ce type de demandes répétitives mobilise une partie importante de votre temps. Pour automatiser ces analyses et permettre un **reporting en libre-service**, vous décidez de mettre en place un **capteur Dagster**.
+
+Vous avez conçu un formulaire d'intake qui génère un fichier **JSON structuré** décrivant la requête et l'insère dans le dossier `data/requests` de votre projet Dagster.
+
+### Objectifs de l'automatisation avec un capteur
+
+Nous allons maintenant configurer un capteur qui surveille l'apparition de nouvelles demandes et exécute automatiquement les analyses associées.
+
+Lorsqu'un **nouveau fichier JSON** représentant une demande d'analyse arrive dans le répertoire, **le capteur est déclenché et matérialise l'asset** correspondant. Si toutes les demandes ont déjà été traitées, **aucune nouvelle matérialisation ne sera effectuée**.
+
+Pour répondre à ces besoins, nous allons :
+
+1. **Écrire une logique permettant de personnaliser la matérialisation des assets en fonction des requêtes**.
+2. **Créer un nouvel asset qui génère un rapport personnalisé par requête**.
+3. **Ajouter un capteur pour surveiller les nouvelles requêtes et déclencher l'analyse automatiquement**.
