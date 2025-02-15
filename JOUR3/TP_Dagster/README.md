@@ -1833,3 +1833,39 @@ Maintenant que vous avez défini comment l'asset peut être matérialisé, créo
         plt.savefig(file_path)
         plt.close(fig)
     ```
+---
+
+### Création d'un job
+
+Ensuite, nous allons créer un job qui matérialise le nouvel asset `adhoc_request`. Ce job sera presque identique à ceux de la **Leçon 7**.
+
+1. **Ajoutez les lignes suivantes dans `jobs/__init__.py`** pour créer un job dédié aux requêtes ad hoc :
+
+    ```python
+    from dagster import define_asset_job, AssetSelection
+
+    adhoc_request = AssetSelection.assets(["adhoc_request"])
+
+    adhoc_request_job = define_asset_job(
+        name="adhoc_request_job",
+        selection=adhoc_request,
+    )
+    ```
+
+2. **Mettez à jour le job existant `trip_update_job`**.
+
+   Actuellement, `trip_update_job` sélectionne **tous les assets** avec `AssetSelection.all()`, ce qui inclurait `adhoc_request`. Cependant, nous ne voulons pas que ce job traite les requêtes ad hoc.
+
+   Comme nous avons déjà exclu `trips_by_week`, nous allons également exclure `adhoc_request` dans la sélection d'assets.
+
+   Modifiez `trip_update_job` comme suit :
+
+    ```python
+    trip_update_job = define_asset_job(
+        name="trip_update_job",
+        partitions_def=monthly_partition,
+        selection=AssetSelection.all() - trips_by_week - adhoc_request
+    )
+    ```
+
+✅ **Ces modifications permettent de gérer séparément les requêtes ad hoc et les mises à jour régulières du pipeline.**
