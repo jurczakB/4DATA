@@ -831,3 +831,104 @@ defs = Definitions(
 5. **Vous devriez voir une resource nommée `database` listée**.
 
 🚀 **À noter** : Pour l'instant, cette resource n'est pas encore utilisée par les assets. La prochaine section couvrira l'intégration de cette resource dans les assets existants.
+
+---
+
+### Utilisation des resources dans les assets
+
+Maintenant que la resource est définie, nous allons modifier l'asset `taxi_trips` pour l'utiliser.
+
+#### Avant l'ajout de la resource
+
+Actuellement, l'asset `taxi_trips` établit une connexion à DuckDB directement :
+
+```python
+@asset(
+    deps=["taxi_trips_file"],
+)
+def taxi_trips() -> None:
+    query = """
+        create or replace table taxi_trips as (
+          select
+            VendorID as vendor_id,
+            PULocationID as pickup_zone_id,
+            DOLocationID as dropoff_zone_id,
+            RatecodeID as rate_code_id,
+            payment_type as payment_type,
+            tpep_dropoff_datetime as dropoff_datetime,
+            tpep_pickup_datetime as pickup_datetime,
+            trip_distance as trip_distance,
+            passenger_count as passenger_count,
+            total_amount as total_amount
+          from 'data/raw/taxi_trips_2023-03.parquet'
+        );
+    """
+
+    conn = backoff(
+        fn=duckdb.connect,
+        retry_on=(RuntimeError, duckdb.IOException),
+        kwargs={
+            "database": os.getenv("DUCKDB_DATABASE"),
+        },
+        max_retries=10,
+    )
+    conn.execute(query)
+```
+
+#### Après l'ajout de la resource
+
+Nous allons modifier `taxi_trips` pour utiliser la resource définie précédemment :
+
+```python
+@asset(
+    deps=["taxi_trips_file"],
+)
+def taxi_trips(database: DuckDBResource) -> None:
+    query = """
+        create or replace table taxi_trips as (
+          select
+            VendorID as vendor_id,
+            PULocationID as pickup_zone_id,
+            DOLocationID as dropoff_zone_id,
+            RatecodeID as rate_code_id,
+            payment_type as payment_type,
+            tpep_dropoff_datetime as dropoff_datetime,
+            tpep_pickup_datetime as pickup_datetime,
+            trip_distance as trip_distance,
+            passenger_count as passenger_count,
+            total_amount as total_amount
+          from 'data/raw/taxi_trips_2023-03.parquet'
+        );
+    """
+
+    with database.get_connection() as conn:
+        conn.execute(query)
+```
+
+#### Changements effectués :
+
+1. **Importation de `DuckDBResource`** :
+   ```python
+   from dagster_duckdb import DuckDBResource
+   ```
+2. **Ajout d'un paramètre `database: DuckDBResource`** dans la signature de la fonction.
+3. **Remplacement de la connexion manuelle à DuckDB** par :
+   ```python
+   with database.get_connection() as conn:
+       conn.execute(query)
+   ```
+
+✅ **Avantages** :
+- Plus besoin d'utiliser `backoff`, la gestion des connexions est intégrée à `DuckDBResource`.
+- Plus de flexibilité pour changer la configuration de la base sans modifier chaque asset.
+
+#### Avant de continuer
+
+Avant de passer à la suite, assurez-vous de :
+
+- **Mettre à jour `assets/trips.py` avec la nouvelle implémentation de `taxi_trips`.**
+- **Recharger les définitions dans Dagster UI.**
+- **Rematérialiser l'asset `taxi_trips`.**
+
+🚀 Une fois ces étapes terminées, la resource est correctement intégrée et prête à être utilisée dans d'autres assets !
+
