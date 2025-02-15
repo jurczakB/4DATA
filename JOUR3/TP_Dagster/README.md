@@ -714,3 +714,33 @@ Avec Dagster, il est possible de :
 - **Créer une réplique d’un environnement de production** en développement afin de tester les modifications sans risques.
 
 🚀 **À retenir** : En appliquant ces bonnes pratiques, vous rendez vos pipelines plus robustes, plus lisibles et plus faciles à maintenir.
+
+---
+
+### Comprendre les resources dans Dagster
+
+Les **resources** sont les outils et services externes utilisés pour créer des assets dans Dagster.
+
+#### Métaphore des cookies 🍪
+
+Reprenons l'exemple de la fabrication de cookies. Pour réaliser une recette, plusieurs **ustensiles** et **appareils** sont nécessaires :
+
+- Un **bol et une cuillère** pour mélanger les ingrédients.
+- Un **plateau de cuisson** pour déposer les cookies.
+- Un **four** pour les cuire.
+
+Ces éléments sont des **resources**, car ils sont utilisés **à plusieurs reprises** dans le processus. Plutôt que de les dupliquer dans chaque étape, il est plus efficace de les **centraliser et réutiliser**.
+
+#### Resources dans Dagster
+
+Dans le contexte des pipelines de données, les resources peuvent inclure :
+
+- Une **API** pour récupérer des données.
+- Un **stockage S3** pour sauvegarder des fichiers.
+- Une **base de données** comme Snowflake ou BigQuery.
+- Un **outil de visualisation** pour afficher les résultats.
+
+Les resources permettent de **standardiser et centraliser** les connexions avec ces services. L'interface **Dagster UI** facilite également la visualisation et la gestion des resources utilisées dans le pipeline.
+
+Dans la prochaine section, nous allons refactoriser notre projet pour gérer les connexions DuckDB via une resource dédiée.
+
