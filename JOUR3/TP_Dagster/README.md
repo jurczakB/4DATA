@@ -1036,3 +1036,9 @@ Exemple d’expression cron :
 
 Des outils comme **Crontab Guru** permettent de tester des expressions cron avant de les utiliser. Toutefois, il est recommandé de tester directement les schedules dans **Dagster UI** pour s’assurer du bon fonctionnement.
 
+---
+
+### Exercice : Création d'un `weekly_update_job`
+
+Pour mettre en pratique ce que vous avez appris, ajoutez un **job** dans `jobs/__init__.py` qui matérialisera l'asset `trips_by_week`.
+
