@@ -1038,7 +1038,34 @@ Des outils comme **Crontab Guru** permettent de tester des expressions cron avan
 
 ---
 
-### Exercice : Création d'un `weekly_update_job`
+### Pratique : Création d'un `weekly_update_job`
 
 Pour mettre en pratique ce que vous avez appris, ajoutez un **job** dans `jobs/__init__.py` qui matérialisera l'asset `trips_by_week`.
 
+---
+
+### Création d'un Schedule
+
+Maintenant que vous connaissez la structure d'un schedule, nous allons en créer un à l'aide de la classe `ScheduleDefinition`.
+
+Ajoutez le code suivant dans `schedules/__init__.py` :
+
+```python
+from dagster import ScheduleDefinition
+from ..jobs import trip_update_job
+
+trip_update_schedule = ScheduleDefinition(
+    job=trip_update_job,
+    cron_schedule="0 0 5 * *",  # Tous les 5 du mois à minuit
+)
+```
+
+#### Explication du code :
+
+- **Importation de `ScheduleDefinition`**.
+- **Importation du job `trip_update_job`**.
+- **Création du schedule `trip_update_schedule`**, qui :
+  - Est attaché au job `trip_update_job`.
+  - Utilise l'expression cron `0 0 5 * *`, qui exécute le job **chaque 5 du mois à minuit**.
+
+🚀 **Votre schedule est maintenant défini !** Passez à la suite pour l'ajouter à Dagster UI.
