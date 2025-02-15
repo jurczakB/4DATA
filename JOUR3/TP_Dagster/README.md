@@ -270,4 +270,92 @@ CREATE OR REPLACE TABLE trips AS (
 
 Nous verrons dans la prochaine section comment exécuter cette requête et intégrer ce chargement dans Dagster.
 
+---
+
+## Chargement des données dans la base de données
+
+Maintenant que nous avons défini une requête SQL permettant de charger les données dans **DuckDB**, nous allons utiliser **Dagster** pour gérer la matérialisation de ces assets. En déléguant cette tâche à Dagster, nous pouvons facilement suivre l'évolution des tables et mesurer le temps d'exécution.
+
+### Définition de l'asset `taxi_trips`
+
+Ajoutez le code suivant à la fin du fichier `trips.py` :
+
+```python
+import duckdb
+import os
+from dagster import asset
+from dagster._utils.backoff import backoff
+
+@asset(
+    deps=["taxi_trips_file"]
+)
+def taxi_trips() -> None:
+    """
+    Le jeu de données brut des trajets en taxi, chargé dans une base de données DuckDB.
+    """
+    query = """
+        CREATE OR REPLACE TABLE trips AS (
+          SELECT
+            VendorID AS vendor_id,
+            PULocationID AS pickup_zone_id,
+            DOLocationID AS dropoff_zone_id,
+            RatecodeID AS rate_code_id,
+            payment_type AS payment_type,
+            tpep_dropoff_datetime AS dropoff_datetime,
+            tpep_pickup_datetime AS pickup_datetime,
+            trip_distance AS trip_distance,
+            passenger_count AS passenger_count,
+            total_amount AS total_amount
+          FROM 'data/raw/taxi_trips_2023-03.parquet'
+        );
+    """
+
+    conn = backoff(
+        fn=duckdb.connect,
+        retry_on=(RuntimeError, duckdb.IOException),
+        kwargs={
+            "database": os.getenv("DUCKDB_DATABASE"),
+        },
+        max_retries=10,
+    )
+    conn.execute(query)
+```
+
+### Explication du code
+
+- **Le décorateur `@asset`** : Permet à Dagster de reconnaître `taxi_trips` comme un asset.
+- **Dépendance `deps=["taxi_trips_file"]`** : Assure que `taxi_trips_file` est matérialisé avant `taxi_trips`.
+- **Requête SQL** : Crée ou remplace la table `trips` en important les données du fichier `taxi_trips_file`.
+- **Connexion sécurisée avec `backoff`** : Permet d'éviter des conflits d'accès multiples à DuckDB.
+
+### Rechargement des définitions
+
+Après avoir ajouté ce nouvel asset, vous devez **recharger les définitions** dans **Dagster UI** :
+
+1. Ouvrez **Dagster UI**.
+2. Cliquez sur **"Reload Definitions"**.
+3. Vérifiez que `taxi_trips` apparaît dans le graphe des assets avec une flèche indiquant sa dépendance à `taxi_trips_file`.
+
+### Matérialisation du pipeline
+
+Dans **Dagster UI**, cliquez sur **"Materialize all"** pour lancer l'exécution des assets :
+
+- **`taxi_trips_file` et `taxi_zones_file` sont exécutés en parallèle**.
+- **`taxi_trips` attend que `taxi_trips_file` soit complété** avant d'être matérialisé.
+
+Cela est possible grâce à la déclaration de dépendance `deps=["taxi_trips_file"]`.
+
+### Vérification de la matérialisation
+
+Pour confirmer que les données ont bien été chargées dans DuckDB, ouvrez un terminal et exécutez les commandes suivantes :
+
+```python
+import duckdb
+conn = duckdb.connect(database="data/staging/data.duckdb")
+conn.execute("SELECT COUNT(*) FROM trips").fetchall()
+```
+
+Si tout s'est bien passé, cette commande affichera le nombre de trajets de taxi ingérés.
+
+🚀 **Félicitations !** Vous avez maintenant construit un pipeline de données complet qui récupère des données depuis une API et les stocke dans une base de données pour analyse.
 
