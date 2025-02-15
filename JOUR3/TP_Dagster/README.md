@@ -1520,7 +1520,7 @@ Pour mettre en pratique ce que vous avez appris, mettez à jour `weekly_update_j
 
 ### Partitions et Backfills dans l'interface Dagster UI
 
-Maintenant que vous avez créé vos partitions, utilisé ces partitions dans les assets et mis à jour les jobs avec des partitions pour créer un planning partitionné, examinons l'affichage dans l'interface Dagster UI. Si vous avez toujours `dagster dev` en cours d'exécution, vous devrez **recharger les définitions** pour assurer la visibilité des partitions.
+Maintenant que vous avez créé vos partitions, utilisé ces partitions dans les assets et mis à jour les jobs avec des partitions pour créer un schedule partitionné, examinons l'affichage dans l'interface Dagster UI. Si vous avez toujours `dagster dev` en cours d'exécution, vous devrez **recharger les définitions** pour assurer la visibilité des partitions.
 
 ### Visualisation et matérialisation des assets avec partitions
 
