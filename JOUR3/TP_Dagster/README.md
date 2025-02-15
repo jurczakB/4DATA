@@ -1077,3 +1077,106 @@ Pour mettre en pratique ce que vous avez appris, ajoutez un **schedule** dans `s
 - **Se nomme `weekly_update_schedule`**.
 - **Matérialise l'asset `trips_by_week`**.
 - **S'exécute chaque lundi à minuit**.
+
+---
+
+### Mise à jour de l'objet Definitions
+
+Avant que les jobs et les schedules puissent être utilisés, vous devez les ajouter à l'objet `Definitions`.
+
+#### Ajout des jobs dans `Definitions`
+
+Revenons aux définitions dans le fichier `__init__.py` à la racine du projet. La première étape consiste à ajouter les jobs pour que les schedules puissent les utiliser.
+
+Ajoutez les imports suivants en haut du fichier :
+
+```python
+from .jobs import trip_update_job, weekly_update_job
+```
+
+Cela permet à Dagster d'importer `trip_update_job` et `weekly_update_job` depuis `jobs/__init__.py`.
+
+Sous la ligne `metric_assets = load_assets_from_modules([metrics])`, ajoutez :
+
+```python
+all_jobs = [trip_update_job, weekly_update_job]
+```
+
+Cela crée une liste `all_jobs` contenant tous les jobs actuels, permettant d'en ajouter d'autres facilement à l'avenir.
+
+Dans l'objet `Definitions`, ajoutez l'argument `jobs` :
+
+```python
+jobs=all_jobs,
+```
+
+À ce stade, le fichier `__init__.py` devrait ressembler à ceci :
+
+```python
+from dagster import Definitions, load_assets_from_modules
+
+from .assets import trips, metrics
+from .resources import database_resource
+from .jobs import trip_update_job, weekly_update_job
+
+trip_assets = load_assets_from_modules([trips])
+metric_assets = load_assets_from_modules([metrics])
+
+all_jobs = [trip_update_job, weekly_update_job]
+
+defs = Definitions(
+    assets=[*trip_assets, *metric_assets],
+    resources={
+        "database": database_resource,
+    },
+    jobs=all_jobs,
+)
+```
+
+#### Ajout des schedules dans `Definitions`
+
+Maintenant que les jobs sont ajoutés, nous allons ajouter les schedules à `Definitions`.
+
+Ajoutez les imports suivants en haut du fichier :
+
+```python
+from .schedules import trip_update_schedule, weekly_update_schedule
+```
+
+Sous la définition de `all_jobs`, ajoutez :
+
+```python
+all_schedules = [trip_update_schedule, weekly_update_schedule]
+```
+
+Enfin, ajoutez l'argument `schedules` dans `Definitions` :
+
+```python
+schedules=all_schedules,
+```
+
+Le fichier `__init__.py` final devrait ressembler à ceci :
+
+```python
+from dagster import Definitions, load_assets_from_modules
+
+from .assets import trips, metrics
+from .resources import database_resource
+from .jobs import trip_update_job, weekly_update_job
+from .schedules import trip_update_schedule, weekly_update_schedule
+
+trip_assets = load_assets_from_modules([trips])
+metric_assets = load_assets_from_modules([metrics])
+
+all_jobs = [trip_update_job, weekly_update_job]
+all_schedules = [trip_update_schedule, weekly_update_schedule]
+
+defs = Definitions(
+    assets=[*trip_assets, *metric_assets],
+    resources={
+        "database": database_resource,
+    },
+    jobs=all_jobs,
+    schedules=all_schedules,
+)
+```
