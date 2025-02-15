@@ -981,3 +981,58 @@ Maintenant que vos assets utilisent la resource `database`, vous pouvez analyser
 Jusqu'à présent, vous avez construit un pipeline de données et l'avez matérialisé manuellement. Cependant, le rôle principal d'un orchestrateur est d'exécuter ces processus sans intervention humaine.
 
 Dans cette section, vous allez découvrir la manière la plus simple d'automatiser la matérialisation régulière des assets : **l'utilisation des schedules**.
+
+---
+
+### Comprendre les Schedules
+
+Les **schedules** sont un moyen traditionnel de maintenir vos assets à jour en définissant un **intervalle de temps fixe** pour exécuter un pipeline. Par exemple, un schedule peut être défini pour une exécution **quotidienne, horaire, ou chaque lundi à 9h00**.
+
+#### Exemple de production automatisée 🍪
+
+Si votre boulangerie connaît un grand succès, vous devez cuire vos cookies **tous les jours à 4h00 du matin** pour qu'ils soient frais lorsque les clients arrivent. Un **schedule Dagster** permettrait d’automatiser ce processus sans intervention humaine.
+
+Dans Dagster, un schedule permet d’exprimer **la fréquence d'exécution d'un pipeline**, et chaque exécution (tick) déclenche une matérialisation des assets.
+
+#### Anatomie d'un Schedule
+
+Un schedule est composé de plusieurs éléments :
+
+- **Un job** qui définit quels assets doivent être matérialisés.
+- **Une expression cron** qui définit la fréquence d'exécution.
+
+Nous allons maintenant créer un schedule qui met à jour la plupart des assets **chaque mois**, en accord avec la publication des nouvelles données de taxi par la NYC Taxi & Limo Commission (TLC).
+
+#### Définition des Jobs
+
+Dans Dagster, **les jobs permettent de sélectionner une partie des assets** à matérialiser. Un **job** est utile lorsqu'on ne veut pas exécuter **tous** les assets à chaque exécution.
+
+Nous allons créer un **job** qui exclut `trips_by_week` car cet asset doit être mis à jour plus fréquemment.
+
+Dans `jobs/__init__.py`, ajoutez :
+
+```python
+from dagster import AssetSelection, define_asset_job
+
+trips_by_week = AssetSelection.assets("trips_by_week")
+
+trip_update_job = define_asset_job(
+    name="trip_update_job",
+    selection=AssetSelection.all() - trips_by_week
+)
+```
+
+#### Expressions Cron
+
+Les **expressions cron** sont le standard pour définir des fréquences d'exécution dans les orchestrateurs.
+
+Exemple d’expression cron :
+
+```
+15 5 * * 1-5
+```
+
+➡️ Cette expression signifie : **Tous les jours ouvrés (lundi-vendredi) à 5h15 du matin**.
+
+Des outils comme **Crontab Guru** permettent de tester des expressions cron avant de les utiliser. Toutefois, il est recommandé de tester directement les schedules dans **Dagster UI** pour s’assurer du bon fonctionnement.
+
