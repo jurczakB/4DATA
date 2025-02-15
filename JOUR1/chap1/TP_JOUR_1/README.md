@@ -597,3 +597,88 @@ Cette première pipeline de données permet d’acquérir les bases de la manipu
 
 📌 **Prochaine étape :** Améliorer la pipeline en ajoutant des logs et la gestion des erreurs pour rendre l’automatisation plus fiable.
 
+--- 
+
+# Creation d'une pipeline de données plus avancée
+
+## Objectif
+L'objectif de cette partie du TP est de construire un **pipeline de donnees** plus complexe en **récupérant des données depuis une API**, en les **nettoyant et structurant**, puis en **les intégrant dans une base de données**. Enfin, nous ajouterons une **étape de visualisation** et planifierons son exécution automatique.
+
+## 1. Extraction des données depuis une API
+### 📌 Tâches à accomplir
+- Identifier une API publique fournissant des données pertinentes (ex: OpenWeatherMap, CoinGecko, etc.).
+- Effectuer une **requête GET** pour récupérer les données en JSON.
+- Enregistrer la réponse dans un fichier JSON local (`data/raw/api_data.json`).
+
+### 📍 Fichier : `scripts/extract_api.py`
+
+💡 **Guides pratiques :**
+- Utiliser la librairie `requests` pour effectuer un appel API.
+- Vérifier le **code de statut HTTP** pour s'assurer que la requête est réussie (`status_code == 200`).
+- Enregistrer la réponse API dans un fichier local en format JSON (`json.dump`).
+
+## 2. Transformation et nettoyage des données
+### 📌 Tâches à accomplir
+- Charger le fichier `api_data.json` dans un **DataFrame Pandas**.
+- Vérifier les **valeurs manquantes** et les traiter.
+- Convertir les formats de données si nécessaire (**dates, nombres, catégories**).
+- Créer des **nouvelles colonnes** utiles pour l’analyse.
+
+### 📍 Fichier : `scripts/transform_data.py`
+
+💡 **Guides pratiques :**
+- Utiliser `pd.read_json()` pour charger les données.
+- Appliquer `df.dropna()`, `df.fillna()`, `df.astype()` pour le nettoyage.
+- Ajouter des colonnes dérivées (`df['new_col'] = df['col1'] * 1.2`).
+- Sauvegarder le DataFrame transformé dans `data/processed/clean_data.csv` avec `df.to_csv()`.
+
+## 3. Intégration dans une base de données SQLite
+### 📌 Tâches à accomplir
+- Créer une **base SQLite** et une table.
+- Insérer les données nettoyées.
+- Vérifier que les données ont bien été insérées.
+
+### 📍 Fichier : `scripts/load_to_db.py`
+
+💡 **Guides pratiques :**
+- Utiliser `sqlite3` ou `SQLAlchemy` pour gérer la base.
+- Créer une connexion avec `sqlite3.connect("data/database.db")`.
+- Charger le CSV nettoyé avec Pandas et l’insérer dans une table (`df.to_sql()`).
+
+## 4. Visualisation et analyse des données
+### 📌 Tâches à accomplir
+- Générer des **statistiques descriptives** sur les données.
+- Réaliser une **visualisation graphique** pertinente (histogrammes, courbes, heatmaps).
+- Enregistrer les figures dans `data/outputs/`.
+
+### 📍 Fichier : `scripts/visualization.py`
+
+💡 **Guides pratiques :**
+- Utiliser `df.describe()` et `df.groupby()` pour résumer les données.
+- Générer des graphiques avec `matplotlib.pyplot` et `seaborn`.
+- Enregistrer les graphiques avec `plt.savefig("data/outputs/graph.png")`.
+
+## 5. Automatisation de l’exécution du pipeline
+### 📌 Tâches à accomplir
+- Automatiser l’exécution du pipeline via **cron (Linux/Mac) ou le planificateur de tâches (Windows)**.
+- Configurer un **script de lancement** qui exécute toutes les étapes dans l’ordre.
+
+### 📍 Fichier : `run_pipeline.sh`
+
+💡 **Guides pratiques :**
+- Écrire un script Bash pour exécuter les fichiers Python dans l’ordre :
+  ```sh
+  python scripts/extract_api.py
+  python scripts/transform_data.py
+  python scripts/load_to_db.py
+  python scripts/visualization.py
+  ```
+- Ajouter une tâche cron pour exécuter le script chaque jour à minuit :
+  ```sh
+  crontab -e
+  0 0 * * * /usr/bin/python3 /chemin/vers/projet/run_pipeline.sh
+  ```
+- Sur Windows, utiliser le Planificateur de tâches pour exécuter `run_pipeline.sh` à intervalles réguliers.
+
+## 🎯 Conclusion
+Vous avez construit un **pipeline de données automatisé** comprenant l’extraction, la transformation, le stockage et la visualisation de données ! Vous pouvez maintenant améliorer votre pipeline en y intégrant **des logs d'exécution**, **une gestion avancée des erreurs**, ou encore en utilisant un orchestrateur comme **Apache Airflow** ou **Dagster**. 🚀
