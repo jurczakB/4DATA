@@ -744,3 +744,90 @@ Les resources permettent de **standardiser et centraliser** les connexions avec 
 
 Dans la prochaine section, nous allons refactoriser notre projet pour gérer les connexions DuckDB via une resource dédiée.
 
+---
+
+### Configuration d'une resource pour la base de données
+
+Tout au long de ce module, nous avons utilisé **DuckDB** pour stocker et transformer les données. Chaque asset nécessitant une connexion à DuckDB contenait une ligne similaire à celle-ci :
+
+```python
+conn = backoff(
+    fn=duckdb.connect,
+    retry_on=(RuntimeError, duckdb.IOException),
+    kwargs={
+        "database": os.getenv("DUCKDB_DATABASE"),
+    },
+    max_retries=10,
+)
+```
+
+Cette approche peut devenir **fragile et source d'erreurs** à mesure que le projet évolue. Une meilleure pratique consiste à **centraliser la gestion de cette connexion** via une **resource Dagster**.
+
+#### Définition d'une resource
+
+Lors de la création du projet, un dossier `resources/` contenant un fichier `__init__.py` a été généré. Nous allons y définir une resource partagée pour gérer la connexion à DuckDB.
+
+Ajoutez le code suivant dans `resources/__init__.py` :
+
+```python
+from dagster_duckdb import DuckDBResource
+
+database_resource = DuckDBResource(
+    database="data/staging/data.duckdb"
+)
+```
+
+Ce code importe la resource `DuckDBResource` de la bibliothèque `dagster_duckdb`, puis crée une instance **réutilisable** de cette resource.
+
+#### Utilisation des variables d'environnement
+
+Les variables d'environnement sont un moyen standardisé de stocker des configurations sensibles (comme des mots de passe ou des chemins de connexion). Jusqu'ici, nous avons utilisé `os.getenv` pour récupérer ces variables dans le fichier `.env`.
+
+Plutôt que d'**inscrire directement le chemin** de la base de données, nous allons utiliser **Dagster's EnvVar** pour le rendre plus dynamique. Modifiez `resources/__init__.py` comme suit :
+
+```python
+from dagster_duckdb import DuckDBResource
+from dagster import EnvVar
+
+database_resource = DuckDBResource(
+    database=EnvVar("DUCKDB_DATABASE")  # Utilisation de la variable d'environnement
+)
+```
+
+#### Différence entre `EnvVar` et `os.getenv`
+
+- **`EnvVar`** récupère la valeur **à chaque exécution**.
+- **`os.getenv`** charge la valeur **une seule fois au démarrage**.
+
+L'utilisation de **`EnvVar`** permet de changer la base de données utilisée **sans redémarrer Dagster**.
+
+#### Mise à jour de `Definitions`
+
+Les resources sont des **définitions Dagster** et doivent être ajoutées à l'objet `Definitions` pour être utilisables.
+
+Dans `dagster_university/__init__.py`, ajoutez :
+
+```python
+from .resources import database_resource
+```
+
+Puis, modifiez `Definitions` pour inclure la resource :
+
+```python
+defs = Definitions(
+    assets=[*trip_assets, *metric_assets],
+    resources={
+        "database": database_resource,
+    },
+)
+```
+
+#### Vérification dans Dagster UI
+
+1. **Rendez-vous dans Dagster UI**.
+2. **Cliquez sur "Deployment"**, puis **"Code locations"**.
+3. **Rechargez les définitions** en cliquant sur "Reload".
+4. **Ouvrez la code location**, puis accédez à l'onglet **Resources**.
+5. **Vous devriez voir une resource nommée `database` listée**.
+
+🚀 **À noter** : Pour l'instant, cette resource n'est pas encore utilisée par les assets. La prochaine section couvrira l'intégration de cette resource dans les assets existants.
