@@ -1515,3 +1515,60 @@ Pour mettre en pratique ce que vous avez appris, mettez à jour `weekly_update_j
 - Testez la matérialisation de partitions distinctes dans Dagster UI.
 
 ✅ **Une fois terminé, vérifiez dans l'interface de Dagster que les partitions s'affichent correctement et que le traitement fonctionne comme prévu.**
+
+---
+
+### Partitions et Backfills dans l'interface Dagster UI
+
+Maintenant que vous avez créé vos partitions, utilisé ces partitions dans les assets et mis à jour les jobs avec des partitions pour créer un planning partitionné, examinons l'affichage dans l'interface Dagster UI. Si vous avez toujours `dagster dev` en cours d'exécution, vous devrez **recharger les définitions** pour assurer la visibilité des partitions.
+
+### Visualisation et matérialisation des assets avec partitions
+
+#### Étape 1
+
+Naviguez vers **Assets > Asset lineage**. Comme vous le verrez dans le graphe des assets, les assets `taxi_trips` contiennent maintenant des informations de partition.
+
+#### Étape 2
+
+En examinant de plus près l'asset `taxi_trips_file`, vous verrez trois partitions représentant les trois mois inclus dans la partition :
+
+- ⚫ `0` indique que **zéro partitions ont été matérialisées avec succès**.
+- O `All` indique que **toutes les partitions (trois) ne sont pas encore matérialisées**.
+- ⚠️ `0` représente qu'**aucune partition n'a échoué**.
+
+Cette information est utile pour obtenir un aperçu rapide de l'état de votre asset.
+
+#### Étape 3
+
+En cliquant sur **Materialize all**, une fenêtre contextuelle s'affichera avec les informations de la partition.
+
+Cela vous permet de choisir **quelles partitions matérialiser** ou de **lancer un backfill** pour matérialiser plusieurs partitions en une seule fois.
+
+### Lancement d'un Backfill
+
+#### Étape 1
+
+Pour démarrer le backfill, cliquez sur **Launch backfill** dans la fenêtre contextuelle précédente. Par défaut, l'intervalle de dates couvrira toute la plage définie.
+
+Ensuite, allez dans **Overview > Backfills** pour voir les informations sur le backfill.
+
+#### Étape 2
+
+Cliquez sur un backfill pour ouvrir sa page de détails. Cette page affiche chaque asset en cours de matérialisation, ainsi que son état.
+
+#### Étape 3
+
+Retournez sur la page **Global Asset Lineage** (**Assets > Asset lineage**).
+
+Dans le graphe des assets, vous verrez que le statut des assets partitionnés et non partitionnés a été mis à jour.
+
+### Visualisation des détails des partitions d'un asset
+
+#### Étape 1
+
+Dans le graphe des assets, cliquez sur l'asset `taxi_trips` et ouvrez-le dans l'**Asset Catalog**. Chaque mois sera listé comme une partition examinable.
+
+#### Étape 2
+
+Sélectionnez `2023-03-01` pour voir une partition spécifique. Vous pourrez alors consulter **les informations spécifiques à cette partition**, y compris son lien avec les données sources (`taxi_trips_file`).
+
