@@ -386,3 +386,100 @@ Cet asset doit :
 
 💡 **Astuce** : Utilisez Dagster UI pour suivre les dépendances et vous assurer que la matérialisation s'exécute correctement.
 
+---
+
+### Assets avec calculs en mémoire
+
+Jusqu'à présent, nous avons orchestré des calculs dans une base de données et effectué des tâches légères en Python, comme le téléchargement de fichiers. Dans cette section, vous allez utiliser Dagster pour orchestrer des calculs en Python et générer un rapport.
+
+#### Introduction aux assets avec calculs en mémoire
+
+Jusqu'ici, les assets définis impliquaient soit l'exécution de requêtes SQL dans une base de données, soit des opérations légères comme le téléchargement de fichiers. Maintenant, vous allez apprendre à utiliser **Dagster** pour orchestrer des calculs en **Python pur**, afin de transformer vos données et générer des rapports.
+
+Afin de mieux organiser le projet, nous allons **séparer les assets selon leur fonction** : les assets liés à l'analyse seront placés dans un fichier distinct.
+
+1. **Créez et ouvrez `metrics.py` dans le répertoire `assets/`**.
+2. **Ajoutez les imports suivants au début du fichier :**
+
+```python
+from dagster import asset
+import matplotlib.pyplot as plt
+import geopandas as gpd
+import duckdb
+import os
+from . import constants
+```
+
+3. **Définissez un nouvel asset `manhattan_stats` et ses dépendances :**
+
+```python
+@asset(
+    deps=["taxi_trips", "taxi_zones"]
+)
+def manhattan_stats() -> None:
+    """
+    Calcule les statistiques des trajets en taxi pour Manhattan et les stocke au format GeoJSON.
+    """
+    query = """
+        SELECT
+            zones.zone,
+            zones.borough,
+            zones.geometry,
+            COUNT(1) AS num_trips
+        FROM trips
+        LEFT JOIN zones ON trips.pickup_zone_id = zones.zone_id
+        WHERE borough = 'Manhattan' AND geometry IS NOT NULL
+        GROUP BY zone, borough, geometry
+    """
+
+    conn = duckdb.connect(os.getenv("DUCKDB_DATABASE"))
+    trips_by_zone = conn.execute(query).fetch_df()
+
+    trips_by_zone["geometry"] = gpd.GeoSeries.from_wkt(trips_by_zone["geometry"])
+    trips_by_zone = gpd.GeoDataFrame(trips_by_zone)
+
+    with open(constants.MANHATTAN_STATS_FILE_PATH, 'w') as output_file:
+        output_file.write(trips_by_zone.to_json())
+```
+
+4. **Recharger les définitions dans Dagster UI et matérialiser `manhattan_stats`**.
+5. **Vérifiez la création du fichier JSON dans `data/staging/manhattan_stats.geojson`**.
+
+### Création d'une carte
+
+Créez un asset `manhattan_map` qui dépend de `manhattan_stats`, charge ses données GeoJSON et génère une visualisation.
+
+1. **Ajoutez le code suivant à la fin du fichier `metrics.py` :**
+
+```python
+@asset(
+    deps=["manhattan_stats"]
+)
+def manhattan_map() -> None:
+    """
+    Génère une carte des trajets en taxi à Manhattan et l'enregistre sous forme d'image.
+    """
+    trips_by_zone = gpd.read_file(constants.MANHATTAN_STATS_FILE_PATH)
+
+    fig, ax = plt.subplots(figsize=(10, 10))
+    trips_by_zone.plot(column="num_trips", cmap="plasma", legend=True, ax=ax, edgecolor="black")
+    ax.set_title("Nombre de trajets par zone de taxi à Manhattan")
+
+    ax.set_xlim([-74.05, -73.90])
+    ax.set_ylim([40.70, 40.82])
+    
+    plt.savefig(constants.MANHATTAN_MAP_FILE_PATH, format="png", bbox_inches="tight")
+    plt.close(fig)
+```
+
+2. **Rechargez les définitions dans Dagster UI**.
+3. **Matérialisez `manhattan_map`**.
+4. **Vérifiez la création de l'image `manhattan_map.png` dans `data/outputs/`**.
+
+### Explication du code
+
+- **L'asset `manhattan_map` dépend de `manhattan_stats`** et charge ses données GeoJSON.
+- **Utilise Matplotlib pour générer une visualisation** de la répartition des trajets en taxi.
+- **Stocke l'image générée sous `data/outputs/manhattan_map.png`**.
+
+🚀 **Félicitations !** Vous avez orchestré un calcul en mémoire et généré une visualisation de données avec Dagster.
