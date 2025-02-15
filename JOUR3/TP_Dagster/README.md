@@ -483,3 +483,46 @@ def manhattan_map() -> None:
 - **Stocke l'image générée sous `data/outputs/manhattan_map.png`**.
 
 🚀 **Félicitations !** Vous avez orchestré un calcul en mémoire et généré une visualisation de données avec Dagster.
+
+---  
+
+### Exercice : Création d'un asset `trips_by_week`
+
+Pour mettre en pratique ce que vous avez appris, créez un asset dans `metrics.py` qui :
+
+- **S'appelle `trips_by_week`**.
+- **Produit un fichier CSV** qui :
+  - Est enregistré à l'emplacement défini par `constants.TRIPS_BY_WEEK_FILE_PATH`.
+  - Contient les colonnes suivantes :
+    - `period` : une chaîne de caractères représentant le dimanche de la semaine agrégée (ex. `2023-03-05`).
+    - `num_trips` : le nombre total de trajets commencés durant cette semaine.
+    - `passenger_count` : le nombre total de passagers sur les trajets de cette semaine.
+    - `total_amount` : la somme totale des revenus générés par les trajets de cette semaine.
+    - `trip_distance` : la distance totale parcourue en miles pour tous les trajets de cette semaine.
+
+### Contraintes supplémentaires (optionnel - challenge avancé)
+
+Si vous souhaitez aller plus loin, imaginez que l'ensemble des données des trajets est trop volumineux pour être chargé entièrement en mémoire, mais qu'une semaine de données peut être traitée confortablement. Réfléchissez à une approche permettant d'adapter l'implémentation en conséquence.
+
+### Conseils
+
+- Toutes les notions nécessaires ont déjà été abordées.
+- Il existe plusieurs solutions possibles, soit en manipulant la base de données, soit en agrégeant un `DataFrame`.
+- Aucun import supplémentaire n'est nécessaire, mais vous pouvez importer tout ce dont vous avez besoin.
+- Pour éviter les problèmes liés à la qualité des données, vous pouvez fixer la période d'analyse entre des dates connues (ex. `2023-03-01` à `2023-03-31`).
+- La fonction `date_trunc` de **DuckDB** permet de tronquer une date à la précision `week`.
+- DuckDB permet d'ajouter des intervalles de temps avec `+ INTERVAL '1 week'`.
+
+### Exemple de sortie attendue
+
+Le fichier CSV généré pourrait ressembler à ceci :
+
+```
+period,num_trips,total_amount,trip_distance,passenger_count
+2023-03-05,679681,18495110.72,2358944.42,886486
+2023-03-12,686461,19151177.45,2664123.87,905296
+2023-03-19,640158,17908993.09,2330611.91,838066
+```
+
+🚀 **À vous de jouer !** Implémentez cet asset et vérifiez son bon fonctionnement en le matérialisant via **Dagster UI**.
+
