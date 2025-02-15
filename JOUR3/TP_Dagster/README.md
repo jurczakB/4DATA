@@ -973,3 +973,11 @@ Maintenant que vos assets utilisent la resource `database`, vous pouvez analyser
 - **Analyser l'augmentation des coûts de service** et retracer leur origine.
 
 🚀 **En utilisant cette interface, vous obtenez une vision claire de l'usage des resources dans vos pipelines Dagster.**
+
+---
+
+### Introduction aux Schedules dans Dagster
+
+Jusqu'à présent, vous avez construit un pipeline de données et l'avez matérialisé manuellement. Cependant, le rôle principal d'un orchestrateur est d'exécuter ces processus sans intervention humaine.
+
+Dans cette section, vous allez découvrir la manière la plus simple d'automatiser la matérialisation régulière des assets : **l'utilisation des schedules**.
