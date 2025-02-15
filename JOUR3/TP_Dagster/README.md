@@ -1264,3 +1264,48 @@ Autres cas d'utilisation :
 - **Rattrapage des partitions manquantes** : Si certaines partitions n’ont pas été générées en raison d'une erreur, un backfill les régénère.
 
 🚀 **Dans la section suivante, vous apprendrez à partitionner un asset dans Dagster !**
+
+---
+
+### Création d'une partition
+
+Dans la section précédente, vous avez mis en place des **schedules** mensuels et hebdomadaires pour matérialiser les assets. Vous allez maintenant modifier ces assets pour **partitionner les données des trajets de taxi** et ajouter une nouvelle partition à chaque exécution planifiée.
+
+Heureusement, les données de trajets sont stockées sous forme de **fichiers parquet séparés par mois**, et NYC OpenData fournit des informations historiques remontant à 2009. Cependant, pour optimiser l'utilisation des ressources, nous allons n'ingérer que les données **depuis le début de 2023**.
+
+#### Définition d'une partition
+
+La première étape consiste à définir une **PartitionDefinition**. Dagster propose des partitions préconstruites pour les données temporelles (**horaires, journalières, hebdomadaires, mensuelles**). 
+
+Selon les bonnes pratiques de Dagster, les partitions doivent être définies dans le répertoire `partitions/`. Pour ce projet, elles seront situées dans `partitions/__init__.py`.
+
+Votre projet Dagster contient également un fichier `assets/constants.py`, qui définit les variables `START_DATE` et `END_DATE` permettant de spécifier la période des trajets à ingérer.
+
+Ajoutez le code suivant dans `partitions/__init__.py` :
+
+```python
+from dagster import MonthlyPartitionsDefinition
+from ..assets import constants
+
+start_date = constants.START_DATE
+end_date = constants.END_DATE
+
+monthly_partition = MonthlyPartitionsDefinition(
+    start_date=start_date,
+    end_date=end_date
+)
+```
+
+🚀 **Ici, nous créons une partition mensuelle `monthly_partition` en utilisant les dates de début et de fin définies dans `constants.py`.**
+
+#### Nettoyage du stockage existant
+
+Avant de continuer, il est recommandé de **supprimer l'historique de matérialisation** des assets existants. Cela est **nécessaire uniquement en environnement local**.
+
+Exécutez les commandes suivantes dans un terminal :
+
+```bash
+rm $DAGSTER_HOME/storage/taxi_trips_file $DAGSTER_HOME/storage/taxi_trips $DAGSTER_HOME/storage/trips_by_week
+```
+
+✅ **Vous êtes maintenant prêt à implémenter la partition des assets !**
