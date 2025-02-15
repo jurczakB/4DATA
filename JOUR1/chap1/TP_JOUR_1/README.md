@@ -10,22 +10,23 @@ Nous allons structurer le projet selon une arborescence bien définie pour organ
 
 Voici l'arborescence recommandée :
 
-```
-projet_pipeline/
-│-- data/                  # Dossiers contenant les fichiers de données
-│   ├── input/             # Fichiers bruts (CSV, JSON, etc.)
-│   ├── processed/         # Fichiers traités et nettoyés
-│   ├── output/            # Résultats finaux
-│
-│-- notebooks/             # Notebooks Jupyter pour l'exploration des données
-│
-│-- scripts/               # Scripts Python
-│   ├── data_cleaning.py   # Nettoyage des données
-│   ├── data_analysis.py   # Analyse et statistiques
-│   ├── database.py        # Interaction avec SQLite
-│
-│-- requirements.txt       # Liste des dépendances
-│-- README.md              # Ce fichier
+```bash
+python-data-pipeline/
+├── data/
+│   ├── input/
+│   │   ├── sample.csv
+│   │   ├── sample.json
+│   ├── output/
+│   │   ├── filtered_data.csv
+│   │   ├── transformed.json
+├── scripts/
+│   ├── load_csv.py
+│   ├── manipulate_json.py
+│   ├── pandas_analysis.py
+│   ├── sqlite_interaction.py
+│   ├── scheduler.py
+├── requirements.txt
+├── README.md
 ```
 
 ---
@@ -241,3 +242,115 @@ print(df)
 ---
 
 Cette première partie est essentielle pour comprendre les bases avant d'aborder la **construction de pipelines de données** dans la suite du TP.
+
+### 1. Chargement et manipulation de fichiers CSV
+
+📌 **Objectif** : Charger un fichier CSV, appliquer des filtres et sauvegarder un nouveau fichier transformé.
+
+📍 **Fichier :** `scripts/load_csv.py`
+
+💡 **Exercices pratiques :**
+
+1. Charger un fichier CSV en DataFrame avec Pandas.
+   - Utiliser `pd.read_csv("data/input/sample.csv")`
+   - Afficher les 5 premières lignes.
+
+2. Filtrer les lignes selon une condition donnée (ex: garder uniquement les valeurs supérieures à 50 dans une colonne donnée).
+   - Utiliser `df[df['colonne'] > 50]`
+
+3. Remplacer les valeurs manquantes d’une colonne par la moyenne des valeurs existantes.
+   - Utiliser `df['colonne'].fillna(df['colonne'].mean())`
+
+4. Renommer certaines colonnes du fichier CSV.
+   - Utiliser `df.rename(columns={'ancienne_colonne': 'nouvelle_colonne'})`
+
+5. Trier le DataFrame par plusieurs colonnes.
+   - Utiliser `df.sort_values(by=['colonne1', 'colonne2'], ascending=[True, False])`
+
+6. Sauvegarder le DataFrame filtré dans un fichier `filtered_data.csv`.
+   - Utiliser `df.to_csv("data/output/filtered_data.csv", index=False)`
+
+---
+
+### 2. Lecture et manipulation de fichiers JSON
+
+📌 **Objectif** : Lire un fichier JSON, modifier son contenu, et sauvegarder un fichier transformé.
+
+📍 **Fichier :** `scripts/manipulate_json.py`
+
+💡 **Exercices pratiques :**
+
+1. Charger un fichier JSON en Python.
+   - Utiliser `json.load(open("data/input/sample.json"))`
+
+2. Modifier une clé spécifique d’un dictionnaire JSON.
+   - Ex: `data["clé"] = "nouvelle_valeur"`
+
+3. Ajouter un nouvel élément à un fichier JSON.
+   - Ex: `data["nouvelle_clé"] = "valeur"`
+
+4. Supprimer une clé spécifique du fichier JSON.
+   - Utiliser `del data["clé"]`
+
+5. Convertir un fichier JSON en DataFrame Pandas.
+   - Utiliser `pd.DataFrame.from_dict(data)`
+
+6. Sauvegarder les modifications dans un fichier `transformed.json`.
+   - Utiliser `json.dump(data, open("data/output/transformed.json", "w"))`
+
+---
+
+### 3. Analyse de données avec Pandas
+
+📌 **Objectif** : Charger un dataset et réaliser des statistiques descriptives.
+
+📍 **Fichier :** `scripts/pandas_analysis.py`
+
+💡 **Exercices pratiques :**
+
+1. Charger un dataset et afficher ses informations générales.
+   - `df.info()` et `df.describe()`
+
+2. Grouper les données par une colonne spécifique et calculer la moyenne d’une autre colonne.
+   - `df.groupby('colonne_groupe')['colonne_cible'].mean()`
+
+3. Filtrer un DataFrame pour afficher uniquement certaines valeurs.
+   - `df[df['colonne'] == 'valeur spécifique']`
+
+4. Fusionner deux DataFrames en utilisant une clé commune.
+   - `pd.merge(df1, df2, on='colonne_commune')`
+
+5. Créer une nouvelle colonne calculée à partir d’autres colonnes.
+   - `df['nouvelle_colonne'] = df['col1'] + df['col2']`
+
+6. Générer un histogramme d’une colonne spécifique.
+   - `df['colonne'].hist()`
+
+---
+
+### 4. Interagir avec SQLite via SQLAlchemy
+
+📌 **Objectif** : Créer une base de données SQLite, insérer des données et les manipuler avec SQLAlchemy.
+
+📍 **Fichier :** `scripts/sqlite_interaction.py`
+
+💡 **Exercices pratiques :**
+
+1. Créer une base de données SQLite et une table avec SQLAlchemy.
+   - `engine = create_engine("sqlite:///data/database.db")`
+   - `Base.metadata.create_all(engine)`
+
+2. Insérer plusieurs lignes de données dans une table.
+   - `session.add_all([Objet1, Objet2])`
+
+3. Exécuter une requête SELECT pour récupérer toutes les données d’une table.
+   - `session.query(Objet).all()`
+
+4. Filtrer les résultats d’une requête SQLAlchemy.
+   - `session.query(Objet).filter(Objet.colonne == valeur).all()`
+
+5. Mettre à jour une entrée spécifique dans la base de données.
+   - `session.query(Objet).filter(Objet.id == valeur).update({Objet.colonne: nouvelle_valeur})`
+
+6. Convertir le résultat d’une requête SQL en DataFrame Pandas.
+   - `pd.read_sql("SELECT * FROM table", engine)`
