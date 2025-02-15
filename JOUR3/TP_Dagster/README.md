@@ -1869,3 +1869,90 @@ Ensuite, nous allons créer un job qui matérialise le nouvel asset `adhoc_reque
     ```
 
 ✅ **Ces modifications permettent de gérer séparément les requêtes ad hoc et les mises à jour régulières du pipeline.**
+
+---
+
+### Création d'un capteur (sensor)
+
+Avec le nouvel asset et la configuration en place, créons un capteur qui réagit aux événements en matérialisant l'asset `adhoc_request`.
+
+Ce capteur va surveiller les nouveaux fichiers JSON déposés dans le répertoire `data/requests`, puis déclencher une exécution du job `adhoc_request_job` avec les paramètres extraits du fichier JSON correspondant.
+
+---
+### Cursors des capteurs
+
+Un **curseur** est une valeur stockée utilisée pour gérer l'état du capteur. Le capteur que nous allons construire utilise un curseur pour garder une trace des requêtes déjà traitées.
+
+Le capteur suivra les étapes suivantes :
+
+1. Lire son curseur (l'état enregistré précédemment).
+2. Vérifier si de nouveaux fichiers JSON sont présents dans `data/requests`.
+3. Comparer les fichiers actuels à ceux déjà traités.
+4. Si de nouveaux fichiers sont détectés, déclencher une exécution pour chaque fichier.
+5. Mettre à jour le curseur avec les fichiers déjà traités.
+
+---
+### Implémentation du capteur
+
+1. **Ajoutez les imports suivants dans `sensors/__init__.py`** :
+
+    ```python
+    from dagster import (
+        RunRequest,
+        SensorEvaluationContext,
+        SensorResult,
+        sensor,
+    )
+    
+    import os
+    import json
+    
+    from ..jobs import adhoc_request_job
+    ```
+
+2. **Définissez le capteur `adhoc_request_sensor`** :
+
+    ```python
+    @sensor(
+        job=adhoc_request_job
+    )
+    def adhoc_request_sensor(context: SensorEvaluationContext):
+        PATH_TO_REQUESTS = os.path.join(os.path.dirname(__file__), "../../", "data/requests")
+    
+        previous_state = json.loads(context.cursor) if context.cursor else {}
+        current_state = {}
+        runs_to_request = []
+    
+        for filename in os.listdir(PATH_TO_REQUESTS):
+            file_path = os.path.join(PATH_TO_REQUESTS, filename)
+            if filename.endswith(".json") and os.path.isfile(file_path):
+                last_modified = os.path.getmtime(file_path)
+    
+                current_state[filename] = last_modified
+    
+                # Vérifie si le fichier est nouveau ou a été modifié
+                if filename not in previous_state or previous_state[filename] != last_modified:
+                    with open(file_path, "r") as f:
+                        request_config = json.load(f)
+    
+                        runs_to_request.append(RunRequest(
+                            run_key=f"adhoc_request_{filename}_{last_modified}",
+                            run_config={
+                                "ops": {
+                                    "adhoc_request": {
+                                        "config": {
+                                            "filename": filename,
+                                            **request_config
+                                        }
+                                    }
+                                }
+                            }
+                        ))
+    
+        return SensorResult(
+            run_requests=runs_to_request,
+            cursor=json.dumps(current_state)
+        )
+    ```
+
+✅ **Ce capteur surveille le dossier `data/requests`, déclenche une exécution pour chaque nouveau fichier JSON et met à jour son état à chaque itération.**
