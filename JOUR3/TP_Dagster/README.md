@@ -932,3 +932,14 @@ Avant de passer à la suite, assurez-vous de :
 
 🚀 Une fois ces étapes terminées, la resource est correctement intégrée et prête à être utilisée dans d'autres assets !
 
+---
+
+### Pratique: Refactorisation des assets pour utiliser les resources
+
+Les assets suivants utilisent la base de données **DuckDB** :
+
+- `taxi_zones`
+- `manhattan_stats`
+- `trips_by_week`
+
+Mettez à jour ces assets pour qu'ils utilisent la resource **DuckDBResource** au lieu d'une connexion directe à la base de données.
