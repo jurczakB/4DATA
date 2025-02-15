@@ -169,3 +169,20 @@ ls data/raw/taxi_trips_2023-03.parquet
 💡 **Remarque** : Le téléchargement du fichier peut prendre quelques instants.
 
 C'est tout ! 🎉 Vous avez maintenant **matérialisé votre premier asset** avec Dagster !
+
+---
+
+## Consultation des détails d'exécution
+
+Maintenant que vous avez matérialisé un asset, il est essentiel de savoir comment consulter les détails d'exécution.
+
+1. **Localiser l'exécution de la matérialisation**
+   - Dans l'interface **Dagster UI**, repérez la section **Materialized - <DATE>** sur la page de l'asset.
+   - Cliquez sur la **date** mise en évidence pour accéder à la page de détails d'exécution.
+
+2. **Consulter les logs et informations**
+   - La page affichera des informations sur l'exécution, y compris les **logs**, les **statuts d'exécution**, et les éventuelles **erreurs**.
+   - Vous pouvez utiliser ces détails pour **identifier et résoudre d'éventuels problèmes**.
+
+Si votre exécution avait échoué, cette page vous aiderait à diagnostiquer la cause et à ajuster votre code en conséquence. Parcourez la afin de vous familiariser avec l'UI et un potentiel débuggage...
+
