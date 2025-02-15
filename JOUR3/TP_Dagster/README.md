@@ -2036,3 +2036,49 @@ Maintenant que le capteur est construit, explorons son affichage dans l'interfac
   - D'autres paramètres liés à son fonctionnement
 
 ✅ **Votre capteur est maintenant visible dans Dagster !** Nous verrons ensuite comment l'activer et l'exécuter automatiquement.
+
+---
+
+### Activation du capteur
+
+Les capteurs sont désactivés par défaut, vous devez donc activer le capteur avant de pouvoir l'utiliser. Cette section vous guidera pour activer le capteur dans l'interface Dagster.
+
+#### Étape 1 : Création d'un fichier de requête
+
+- Accédez au dossier `data/requests`.
+- Vous y trouverez un fichier `README` contenant des instructions pour déclencher le capteur.
+- Utilisez l'exemple `.json` du `README` pour créer un fichier nommé `january-staten-island.json` contenant le code suivant :
+
+```json
+{
+  "start_date": "2023-01-10",
+  "end_date": "2023-01-25",
+  "borough": "Staten Island"
+}
+```
+
+#### Étape 2 : Tester le capteur dans l'interface Dagster
+
+Dagster permet de tester les capteurs directement depuis l'interface, ce qui est utile pour simuler des capteurs qui sont déclenchés trop fréquemment ou trop rarement.
+
+- Si vous avez quitté la page des détails du capteur `adhoc_request_sensor`, retournez-y.
+- Cliquez sur le bouton **Test Sensor** en haut à droite de la page. Cela permet de produire un tick unique sans activer le capteur.
+- Cliquez sur **Evaluate** pour commencer le test.
+
+#### Étape 3 : Examiner les résultats du test
+
+- Une fois le test terminé, les résultats s'afficheront.
+- Cliquez sur **Open in Launchpad** pour naviguer vers le job `adhoc_request_job`.
+
+#### Étape 4 : Lancer le job
+
+- Dans **Launchpad**, observez que la configuration a été pré-remplie avec les données du fichier `january-staten-island.json`.
+- Cliquez sur **Launch Run** en bas de la page pour soumettre l'exécution du job.
+
+#### Étape 5 : Vérification des résultats
+
+- Une fois l'exécution terminée, accédez au dossier `data/outputs` dans le répertoire du projet.
+- Vous devriez voir un graphique à barres représentant le nombre de trajets par heure dans **Staten Island** en janvier 2023.
+
+✅ **Votre capteur est maintenant activé et fonctionne comme prévu !**
+
