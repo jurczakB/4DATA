@@ -526,3 +526,74 @@ period,num_trips,total_amount,trip_distance,passenger_count
 
 🚀 **À vous de jouer !** Implémentez cet asset et vérifiez son bon fonctionnement en le matérialisant via **Dagster UI**.
 
+---
+
+### Comprendre l'objet `Definitions`
+
+L'objet **`Definitions`** regroupe l'ensemble des définitions utilisées par Dagster et les rend accessibles aux outils Dagster. Il permet d'assigner des définitions à une **code location**, chaque code location ne pouvant contenir qu'un seul `Definitions`. Cela permet d'isoler plusieurs projets Dagster sans nécessiter plusieurs déploiements.
+
+#### Où est défini `Definitions` ?
+
+Dans Dagster, l'objet `Definitions` est défini dans le fichier `__init__.py` à la racine du projet. Ce fichier joue un rôle clé dans la gestion des assets et leur découverte par Dagster.
+
+Ouvrez le fichier `dagster_university/__init__.py` dans votre projet. Il devrait contenir un code similaire à ceci :
+
+```python
+from dagster import Definitions, load_assets_from_modules
+
+from .assets import trips, metrics
+
+trip_assets = load_assets_from_modules([trips])
+metric_assets = load_assets_from_modules([metrics])
+
+defs = Definitions(
+    assets=[*trip_assets, *metric_assets]
+)
+```
+
+### Décomposition du fichier `__init__.py`
+
+1. **Importation des outils Dagster**
+
+```python
+from dagster import Definitions, load_assets_from_modules
+```
+
+Cette ligne introduit l'objet `Definitions` et la méthode `load_assets_from_modules`, utilisée pour charger les assets définis dans le projet.
+
+2. **Organisation des assets en modules**
+
+```python
+from .assets import trips, metrics
+```
+
+Conformément aux bonnes pratiques recommandées par Dagster, les assets sont stockés dans des modules distincts.
+
+3. **Chargement des assets à partir des modules**
+
+```python
+trip_assets = load_assets_from_modules([trips])
+metric_assets = load_assets_from_modules([metrics])
+```
+
+Cette étape stocke les assets des modules `trips` et `metrics` dans des variables, en les chargeant dynamiquement.
+
+4. **Création de l'objet `Definitions`**
+
+```python
+defs = Definitions(
+    assets=[*trip_assets, *metric_assets]
+)
+```
+
+Cette instruction combine les différents assets et les associe à `Definitions`. Cet objet est essentiel, car Dagster recherche automatiquement un `Definitions` dans `__init__.py` lorsqu'on exécute `dagster dev`.
+
+### Pourquoi est-ce important ?
+
+- `Definitions` permet à Dagster de charger et de reconnaître les assets du projet.
+- Lorsqu'un projet Dagster grandit, il est nécessaire de **mettre à jour `Definitions`** pour y inclure de nouveaux assets, ressources ou capteurs.
+- En isolant chaque projet via une **code location**, Dagster permet une meilleure gestion et modularité des assets.
+
+🚀 **À retenir** : `Definitions` est le point central permettant à Dagster de comprendre et d'exécuter les assets de votre projet. Toute modification dans la structure des assets doit être répercutée dans cet objet.
+
+
