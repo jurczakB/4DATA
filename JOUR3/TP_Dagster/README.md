@@ -1319,3 +1319,109 @@ Pour mettre en pratique ce que vous avez appris, créez une **partition hebdomad
 Ajoutez la définition de cette partition dans `partitions/__init__.py` en respectant la structure existante du projet.
 
 🚀 **Une fois la partition créée, elle pourra être utilisée pour organiser les données des trajets de taxi par semaine !**
+
+---
+
+### Ajout de partitions aux assets
+
+Dans cette section, vous allez mettre à jour les assets dans `assets/trips.py` pour utiliser les partitions.
+
+Commençons par `taxi_trips_file`, dont le code actuel est le suivant :
+
+```python
+@asset
+def taxi_trips_file() -> None:
+    """
+      Les fichiers parquet bruts du dataset des trajets de taxi. Source : NYC Open Data.
+    """
+    month_to_fetch = '2023-03'
+    raw_trips = requests.get(
+        f"https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_{month_to_fetch}.parquet"
+    )
+
+    with open(constants.TAXI_TRIPS_TEMPLATE_FILE_PATH.format(month_to_fetch), "wb") as output_file:
+        output_file.write(raw_trips.content)
+```
+
+Dans cet asset, `month_to_fetch` est défini sur `2023-03` pour récupérer les données des trajets de mars 2023. En utilisant `monthly_partition`, vous pouvez mettre à jour l'asset pour récupérer dynamiquement les données en fonction de la partition.
+
+### Ajout de la partition à l'asset :
+
+1. **Importer `monthly_partition`** depuis le dossier partitions en ajoutant la ligne suivante en haut du fichier `assets/trips.py` :
+
+    ```python
+    from ..partitions import monthly_partition
+    ```
+
+2. **Modifier le décorateur `@asset`** pour ajouter le paramètre `partitions_def` avec `monthly_partition` :
+
+    ```python
+    @asset(
+        partitions_def=monthly_partition
+    )
+    ```
+
+3. **Inclure l'argument `context` pour accéder aux métadonnées**
+
+    Dans Dagster, l'argument `context` fournit des métadonnées sur la matérialisation en cours. Ajoutez cet argument à la fonction et activez l'annotation de type en important `AssetExecutionContext` :
+
+    ```python
+    from dagster import asset, AssetExecutionContext
+
+    @asset(
+        partitions_def=monthly_partition
+    )
+    def taxi_trips_file(context: AssetExecutionContext) -> None:
+    ```
+
+    **Remarque :** L'argument `context` n'est pas spécifique aux partitions. Cependant, c'est la première fois que vous l'utilisez dans Dagster University. Il fournit des informations sur l'exécution de l'asset, telles que la partition en cours de traitement, le job qui a déclenché la matérialisation ou les métadonnées des exécutions précédentes.
+
+4. **Utiliser la clé de partition pour récupérer dynamiquement les données du mois correspondant**
+
+    ```python
+    @asset(
+        partitions_def=monthly_partition
+    )
+    def taxi_trips_file(context: AssetExecutionContext) -> None:
+        partition_date_str = context.partition_key
+    ```
+
+5. **Adapter la clé de partition au format attendu par la source de données**
+
+    Dans NYC OpenData, les fichiers de trajets de taxi sont structurés au format `YYYY-MM`. Cependant, `context.partition_key` fournit la date de la partition sous forme de chaîne `YYYY-MM-DD`. Il faut donc adapter ce format :
+
+    ```python
+    @asset(
+        partitions_def=monthly_partition
+    )
+    def taxi_trips_file(context: AssetExecutionContext) -> None:
+        partition_date_str = context.partition_key
+        month_to_fetch = partition_date_str[:-3]
+    ```
+
+Après avoir suivi ces étapes, l'asset `taxi_trips_file` doit ressembler au code ci-dessous :
+
+```python
+from ..partitions import monthly_partition
+
+@asset(
+    partitions_def=monthly_partition
+)
+def taxi_trips_file(context: AssetExecutionContext) -> None:
+  """
+      Les fichiers parquet bruts du dataset des trajets de taxi. Source : NYC Open Data.
+  """
+
+  partition_date_str = context.partition_key
+  month_to_fetch = partition_date_str[:-3]
+
+  raw_trips = requests.get(
+      f"https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_{month_to_fetch}.parquet"
+  )
+
+  with open(constants.TAXI_TRIPS_TEMPLATE_FILE_PATH.format(month_to_fetch), "wb") as output_file:
+      output_file.write(raw_trips.content)
+```
+
+✅ **Désormais, `taxi_trips_file` est partitionné et utilisera la partition correspondante à chaque matérialisation !**
+
