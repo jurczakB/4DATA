@@ -241,4 +241,33 @@ Vous allez maintenant construire un pipeline complet qui :
 
 Pendant ce processus, vous apprendrez à définir des dépendances entre assets pour structurer vos pipelines efficacement.
 
+---
+
+## Exécution des assets et base de données
+
+Précédemment, nous avons créé deux assets indépendants : `taxi_trips_file` et `taxi_zones_file`. Maintenant, nous allons créer de nouveaux assets qui dépendent de ces fichiers de données.
+
+Avant de travailler avec ces fichiers, il est préférable de les charger dans une base de données pour améliorer l'efficacité et le stockage. Heureusement, le projet est configuré avec **DuckDB**, une base de données intégrée qui facilite l'ingestion et la requête de données.
+
+DuckDB permet notamment d'exécuter des requêtes SQL directement sur des fichiers. Par exemple, pour charger le fichier `taxi_trips_file` dans DuckDB, on pourrait exécuter la requête SQL suivante :
+
+```sql
+CREATE OR REPLACE TABLE trips AS (
+    SELECT
+        VendorID AS vendor_id,
+        PULocationID AS pickup_zone_id,
+        DOLocationID AS dropoff_zone_id,
+        RatecodeID AS rate_code_id,
+        payment_type AS payment_type,
+        tpep_dropoff_datetime AS dropoff_datetime,
+        tpep_pickup_datetime AS pickup_datetime,
+        trip_distance AS trip_distance,
+        passenger_count AS passenger_count,
+        total_amount AS total_amount
+    FROM 'data/raw/taxi_trips_2023-03.parquet'
+);
+```
+
+Nous verrons dans la prochaine section comment exécuter cette requête et intégrer ce chargement dans Dagster.
+
 
