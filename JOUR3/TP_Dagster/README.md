@@ -41,3 +41,37 @@ Pour installer **Dagster** dans votre environnement Python actuel, exécutez la 
 ```sh
 pip install dagster~=1.9
 ```
+
+---
+
+## Création du projet Dagster
+
+Créons votre premier projet Dagster ! Pour cela, utilisez la commande `dagster project from-example` afin de cloner le projet officiel **Dagster University** sur votre machine locale.
+
+Pour créer le projet, exécutez :
+
+```sh
+dagster project from-example --example project_dagster_university_start --name dagster_university
+```
+
+Après l'exécution de cette commande, un nouveau répertoire nommé **dagster_university** sera créé dans votre répertoire actuel. Ce répertoire contiendra les fichiers constituant votre projet Dagster.
+
+Ensuite, configurez les variables d'environnement par défaut et installez les dépendances Python du projet en exécutant :
+
+```sh
+cd dagster_university
+cp .env.example .env
+pip install -e ".[dev]"
+```
+
+L'option `-e` installe le projet en mode **éditable**, ce qui améliore l'expérience de développement en réduisant le temps nécessaire pour tester une modification. Les principales exceptions sont l'ajout de nouveaux assets ou l'installation de dépendances supplémentaires.
+
+Pour vérifier que l'installation a réussi et que vous pouvez exécuter Dagster en local, lancez :
+
+```sh
+dagster dev
+```
+
+Naviguez vers **[localhost:3000](http://localhost:3000)**, où vous devriez voir l'interface utilisateur de Dagster.
+
+💡 **Remarque** : La commande `dagster dev` exécutera Dagster en continu jusqu'à ce que vous l'arrêtiez. Pour arrêter le processus en cours d'exécution, utilisez **Control + C** dans le terminal.
