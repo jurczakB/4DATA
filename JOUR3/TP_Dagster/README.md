@@ -34,7 +34,7 @@ pip --version
 
 ## Installation
 
-💡 **Remarque** : Nous recommandons fortement d'installer Dagster dans un **environnement virtuel Python**. Si vous avez besoin d'un rappel sur la création et l'activation d'un environnement virtuel, consultez [cet article de blog](https://realpython.com/python-virtual-environments-a-primer/).
+💡 **Remarque** : Il est fortement recommandé d'installer Dagster dans un **environnement virtuel Python**. Si vous avez besoin d'un rappel sur la création et l'activation d'un environnement virtuel, consultez [cet article de blog](https://realpython.com/python-virtual-environments-a-primer/).
 
 Pour installer **Dagster** dans votre environnement Python actuel, exécutez la commande suivante :
 
