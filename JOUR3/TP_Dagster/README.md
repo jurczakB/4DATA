@@ -596,4 +596,57 @@ Cette instruction combine les différents assets et les associe à `Definitions`
 
 🚀 **À retenir** : `Definitions` est le point central permettant à Dagster de comprendre et d'exécuter les assets de votre projet. Toute modification dans la structure des assets doit être répercutée dans cet objet.
 
+---
+
+### Comprendre les code locations dans Dagster
+
+Nous avons parlé des `Definitions`, mais qu'en est-il des **code locations** ? Comment fonctionnent-elles avec les `Definitions` ?
+
+Une **code location** est un regroupement de définitions Dagster, telles que les assets, permettant d'organiser et d'exécuter le code de manière isolée. Une code location est composée de :
+
+- **Un module Python** contenant un objet `Definitions`.
+- **Un environnement Python** capable de charger ce module.
+
+#### Pourquoi les code locations sont-elles utiles ?
+
+Dans l'univers du développement logiciel, un **déploiement** est le processus permettant de rendre une application accessible aux utilisateurs. Un déploiement Dagster inclut tous les éléments nécessaires à son exécution : Python, les packages comme Pandas, l'interface Dagster UI, etc.
+
+À mesure que les organisations grandissent et que plusieurs équipes orchestrent leurs données, un unique déploiement Dagster devient difficile à gérer. Cela peut entraîner plusieurs problèmes :
+
+- Une équipe déployant un changement pourrait provoquer des **interruptions** pour une autre équipe.
+- Deux modèles d'apprentissage automatique pourraient nécessiter **des versions différentes d'une même bibliothèque**.
+- Une équipe pourrait être contrainte d'utiliser une **ancienne version d'un orchestrateur** en raison de conflits de dépendances.
+- Un trop grand nombre d'assets dans un seul environnement peut **rendre la navigation difficile**.
+
+Plutôt que de multiplier les déploiements (ce qui ajouterait de la complexité et des coûts en gestion des infrastructures), Dagster permet de **segmenter le code en plusieurs code locations**. Cela permet aux équipes d'isoler leur code tout en conservant une gestion centralisée des assets.
+
+#### Exemple : La métaphore de la cuisine
+
+Imaginons que vous ouvriez une **boulangerie** pour produire des cookies à grande échelle. Vous pourriez diviser l'espace en plusieurs cuisines spécialisées :
+
+- Une **cuisine de test** pour expérimenter de nouvelles recettes.
+- Un **atelier d'emballage** pour conditionner les cookies.
+- Une **zone de décoration** pour ajouter des finitions aux cookies.
+
+Chaque zone fonctionne indépendamment, ce qui évite que des incidents dans l'une n'affectent les autres (ex. un incendie dans la cuisine de test ne mettrait pas en péril la production principale). **C'est exactement ce que permettent les code locations dans Dagster**.
+
+#### Utilisation des code locations dans Dagster
+
+Chaque **boîte** sur le schéma ci-dessous représente une code location. En séparant les code locations des services principaux de Dagster, le code des utilisateurs est isolé et sécurisé. Cela signifie qu'un code location peut :
+
+- Avoir **sa propre version de Python**.
+- Gérer **ses propres dépendances**.
+- Exécuter son code sans impacter les autres parties du projet.
+
+#### Organisation des code locations
+
+Les code locations peuvent être utilisées pour segmenter le code en différentes catégories :
+
+- **Par équipe** (ex. marketing, produit, data science).
+- **Par version de Python** (ex. un code legacy en Python 3.9 et un code plus récent en Python 3.11).
+- **Par version de dépendances** (ex. un modèle utilisant `PyTorch v1` et un autre `PyTorch v2`).
+
+Même si ces code locations sont **isolées**, elles restent connectées via une même **instance Dagster**. Un asset défini dans une code location peut dépendre d'un asset d'une autre code location.
+
+🚀 **À retenir** : Les code locations permettent d'éviter les conflits entre équipes, de garantir l'évolutivité du projet et d'offrir une meilleure gestion des dépendances sans avoir besoin de multiplier les déploiements Dagster.
 
