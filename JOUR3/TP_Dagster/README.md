@@ -1309,3 +1309,13 @@ rm $DAGSTER_HOME/storage/taxi_trips_file $DAGSTER_HOME/storage/taxi_trips $DAGST
 ```
 
 ✅ **Vous êtes maintenant prêt à implémenter la partition des assets !**
+
+---
+
+### Pratique : Création d'une partition hebdomadaire
+
+Pour mettre en pratique ce que vous avez appris, créez une **partition hebdomadaire** en utilisant `WeeklyPartitionsDefinition` de Dagster avec les mêmes dates de début et de fin.
+
+Ajoutez la définition de cette partition dans `partitions/__init__.py` en respectant la structure existante du projet.
+
+🚀 **Une fois la partition créée, elle pourra être utilisée pour organiser les données des trajets de taxi par semaine !**
