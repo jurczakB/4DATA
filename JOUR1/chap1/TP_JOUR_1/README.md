@@ -517,7 +517,7 @@ Créer une base de données SQLite, insérer des données et les manipuler avec 
 ## 3. Création de pipelines de données (ETL)
 
 ### Objectif :
-Créer une première pipeline ETL permettant d’extraire, transformer et charger des données en automatisant les tâches.
+Créer une première pipeline ETL permettant d’extraire, transformer et charger des données en automatisant les tâches. Ci-après figurent des indications et des pistes avec des extraits de code. Cependant, c'est à vous de bien stucturer les étapes de cette première pipeline en utilisant les bonnes pratiques vues durant le cours (fonctions réutilisables, logs, documentation des fonctions, utiliser les bons scripts python pour la bonne action,...)
 
 ### Structure du pipeline :
 Le pipeline sera structuré en trois étapes principales :
