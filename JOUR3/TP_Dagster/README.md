@@ -359,3 +359,30 @@ Si tout s'est bien passé, cette commande affichera le nombre de trajets de taxi
 
 🚀 **Félicitations !** Vous avez maintenant construit un pipeline de données complet qui récupère des données depuis une API et les stocke dans une base de données pour analyse.
 
+---  
+
+### Pratique : Création d'un asset `taxi_zones`
+
+En utilisant vos connaissances sur la gestion des dépendances entre assets, créez un asset `taxi_zones` qui utilise `taxi_zones_file` pour générer une table `zones` dans DuckDB.
+
+Cet asset doit :
+
+- **S'appeler `taxi_zones`**.
+- **Utiliser le fichier `taxi_zones_file`** comme source de données.
+- **Créer une table `zones` dans DuckDB** avec les colonnes suivantes :
+  - `zone_id`, correspondant à `LocationID`, renommé.
+  - `zone`.
+  - `borough`.
+  - `geometry`, correspondant à `the_geom`, renommé.
+
+### Instructions
+
+1. Modifiez le fichier `trips.py` pour ajouter l'asset `taxi_zones`.
+2. Assurez-vous que `taxi_zones_file` est correctement référencé comme dépendance.
+3. Utilisez une requête SQL pour transformer et charger les données dans DuckDB.
+4. Rechargez les définitions dans **Dagster UI**.
+5. Matérialisez l'asset `taxi_zones` après `taxi_zones_file`.
+6. Vérifiez que la table `zones` a bien été créée dans DuckDB.
+
+💡 **Astuce** : Utilisez Dagster UI pour suivre les dépendances et vous assurer que la matérialisation s'exécute correctement.
+
