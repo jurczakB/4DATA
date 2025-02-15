@@ -1956,3 +1956,56 @@ Le capteur suivra les étapes suivantes :
     ```
 
 ✅ **Ce capteur surveille le dossier `data/requests`, déclenche une exécution pour chaque nouveau fichier JSON et met à jour son état à chaque itération.**
+
+---
+
+### Mise à jour de l'objet Definitions
+
+Comme pour les autres définitions de Dagster, la dernière étape consiste à ajouter le capteur, son asset associé et son job dans l'objet `Definitions`. Cela se fera dans le fichier `__init__.py` de niveau supérieur.
+
+1. **Ajoutez les nouvelles importations dans `__init__.py`** :
+
+    ```python
+    from dagster import Definitions, load_assets_from_modules
+
+    from .assets import trips, metrics, requests
+    from .resources import database_resource
+    from .jobs import trip_update_job, weekly_update_job, adhoc_request_job
+    from .schedules import trip_update_schedule, weekly_update_schedule
+    from .sensors import adhoc_request_sensor
+    ```
+
+2. **Ajoutez l'asset `request_assets`** en chargeant les assets depuis `requests` :
+
+    ```python
+    request_assets = load_assets_from_modules([requests])
+    ```
+
+3. **Ajoutez `adhoc_request_job` à `all_jobs`** :
+
+    ```python
+    all_jobs = [trip_update_job, weekly_update_job, adhoc_request_job]
+    ```
+
+4. **Ajoutez `adhoc_request_sensor` à `all_sensors`** :
+
+    ```python
+    all_sensors = [adhoc_request_sensor]
+    ```
+
+5. **Mettez à jour l'objet `Definitions`** :
+
+    ```python
+    defs = Definitions(
+        assets=[*trip_assets, *metric_assets, *request_assets],
+        resources={
+            "database": database_resource,
+        },
+        jobs=all_jobs,
+        schedules=all_schedules,
+        sensors=all_sensors
+    )
+    ```
+
+✅ **Votre sensor `adhoc_request_sensor` est maintenant enregistré et prêt à être utilisé dans Dagster !**
+
