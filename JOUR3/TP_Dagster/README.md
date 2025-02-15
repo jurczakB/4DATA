@@ -1425,3 +1425,33 @@ def taxi_trips_file(context: AssetExecutionContext) -> None:
 
 ✅ **Désormais, `taxi_trips_file` est partitionné et utilisera la partition correspondante à chaque matérialisation !**
 
+---
+
+### Exercice : Partitionner l'asset `taxi_trips`
+
+Pour mettre en pratique ce que vous avez appris, partitionnez l'asset `taxi_trips` par mois en suivant ces directives :
+
+- Étant donné qu'un fichier parquet d'un mois donné peut contenir des données historiques en dehors du mois, il est recommandé de partitionner **par le mois du fichier parquet** et non par le mois du trajet.
+- À chaque partition, insérez les nouvelles données dans la table `taxi_trips`.
+- Ajoutez une colonne `partition_date` pour représenter de quelle partition provient chaque enregistrement.
+
+### Suppression de la table existante
+
+Avant d'appliquer ces modifications, vous devez supprimer l'ancienne table `taxi_trips` en raison de l'ajout de la nouvelle colonne `partition_date`. Pour cela, exécutez la commande suivante dans un REPL Python ou un script temporaire :
+
+```python
+import duckdb
+conn = duckdb.connect(database="data/staging/data.duckdb")
+conn.execute("drop table trips;")
+```
+
+### Adaptation de la requête SQL
+
+Étant donné que la table `taxi_trips` existera après la première matérialisation d'une partition, la requête SQL devra être mise à jour pour :
+
+1. **Créer la table `taxi_trips` si elle n'existe pas déjà.**
+2. **Supprimer les anciennes données correspondant à `partition_date`** pour éviter les doublons lors d'un backfill.
+3. **Insérer les nouveaux enregistrements du fichier parquet correspondant au mois de la partition.**
+
+✅ **Modifiez `taxi_trips` pour appliquer cette partition et validez votre implémentation dans Dagster UI !**
+
