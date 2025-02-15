@@ -511,3 +511,89 @@ Créer une base de données SQLite, insérer des données et les manipuler avec 
    import pandas as pd
    df = pd.read_sql("SELECT * FROM customers", engine)
    ```
+
+   ---
+
+## 3. Création de pipelines de données (ETL)
+
+### Objectif :
+Créer une première pipeline ETL permettant d’extraire, transformer et charger des données en automatisant les tâches.
+
+### Structure du pipeline :
+Le pipeline sera structuré en trois étapes principales :
+1. **Extraction** : Charger des fichiers CSV et JSON en DataFrame.
+2. **Transformation** : Nettoyage et enrichissement des données.
+3. **Chargement** : Sauvegarde des données dans une base SQLite.
+
+### Fichier : `scripts/etl_pipeline.py`
+
+### Étapes de la pipeline :
+
+#### 1. Extraction des données
+
+```python
+import pandas as pd
+import json
+
+def extract_csv(file_path):
+    return pd.read_csv(file_path)
+
+def extract_json(file_path):
+    with open(file_path, "r") as f:
+        return pd.DataFrame(json.load(f))
+
+sales_data = extract_csv("data/sales_data.csv")
+customers_data = extract_json("data/customers.json")
+```
+
+#### 2. Transformation des données
+
+```python
+# Nettoyage des données
+sales_data.dropna(inplace=True)
+sales_data = sales_data[sales_data['total_amount'] > 0]
+
+# Fusion avec les données clients
+merged_data = pd.merge(sales_data, customers_data, on='customer_id', how='left')
+
+# Création d’une nouvelle colonne
+merged_data['total_with_tax'] = merged_data['total_amount'] * 1.2
+```
+
+#### 3. Chargement des données dans SQLite
+
+```python
+from sqlalchemy import create_engine
+
+engine = create_engine("sqlite:///data/database.db")
+merged_data.to_sql("sales_data", con=engine, if_exists="replace", index=False)
+```
+
+#### 4. Planification de l'exécution (Scheduling)
+
+Un pipeline ETL peut être automatisé à l'aide de `cron` sous Linux ou d'un planificateur de tâches sous Windows.
+
+**Exemple de configuration avec `cron` :**
+
+Ouvrir le crontab avec la commande :
+```bash
+crontab -e
+```
+
+Ajouter une ligne pour exécuter le script tous les jours à minuit :
+```bash
+0 0 * * * /usr/bin/python3 /chemin/vers/le_projet/scripts/etl_pipeline.py
+```
+
+**Sur Windows, utiliser le planificateur de tâches :**
+- Créer une nouvelle tâche
+- Sélectionner "Exécuter un programme"
+- Ajouter `python.exe` comme programme et `C:\chemin\vers\le_projet\scripts\etl_pipeline.py` comme argument.
+
+---
+
+### Conclusion
+Cette première pipeline de données permet d’acquérir les bases de la manipulation et de l’automatisation des traitements de données. Elle sera la base des prochaines étapes, où nous intégrerons des outils avancés comme **Apache Airflow** ou **Dagster** pour orchestrer et surveiller les pipelines de données de manière plus robuste.
+
+📌 **Prochaine étape :** Améliorer la pipeline en ajoutant des logs et la gestion des erreurs pour rendre l’automatisation plus fiable.
+
