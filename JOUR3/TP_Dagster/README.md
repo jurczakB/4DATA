@@ -1501,3 +1501,17 @@ trip_update_job = define_asset_job(
     selection=AssetSelection.all() - trips_by_week
 )
 ```
+---
+
+### Pratique : Partitionner l'asset `trips_by_week`
+
+Pour mettre en pratique ce que vous avez appris, mettez à jour `weekly_update_job` et `trips_by_week` pour qu'ils soient partitionnés de manière hebdomadaire. Utilisez votre définition `weekly_partition` existante provenant de l'exercice précédent.
+
+### Instructions :
+
+- Ajoutez `partitions_def=weekly_partition` à l'asset `trips_by_week`.
+- Assurez-vous que `weekly_update_job` utilise également `weekly_partition`.
+- Vérifiez que la clé de partition est correctement intégrée dans la logique de récupération et d'insertion des données.
+- Testez la matérialisation de partitions distinctes dans Dagster UI.
+
+✅ **Une fois terminé, vérifiez dans l'interface de Dagster que les partitions s'affichent correctement et que le traitement fonctionne comme prévu.**
