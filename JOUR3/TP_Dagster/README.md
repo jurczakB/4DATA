@@ -1215,3 +1215,52 @@ En sélectionnant un job, vous pourrez voir son **graphe des assets**.
 - **Tester un schedule** : cliquez sur **Test Schedule** et sélectionnez un moment de simulation avant de cliquer sur **Évaluer**.
 
 🚀 **Avec ces outils, vous avez maintenant une gestion complète des jobs et schedules dans Dagster UI !**
+
+---
+
+### Introduction aux Partitions dans Dagster
+
+Dans la leçon précédente, vous avez appris à exécuter vos pipelines régulièrement grâce aux **schedules**. 
+
+Revenons à notre analogie des cookies : si votre entreprise prospère, vous commencerez à prendre des **commandes en avance**. Préparer chaque cookie dès qu’une commande arrive créerait des problèmes, car :
+
+- **Les commandes du jour sont plus urgentes** que celles prévues pour la semaine prochaine.
+- **Le volume de commandes fluctue** : certains jours, vous recevez 100 commandes, et d'autres jours, aucune.
+
+Pour optimiser la production, vous **groupez** les commandes par **jour de retrait**, en ne préparant que celles du jour concerné. 
+
+Ce concept de **partitionnement** s'applique également aux **pipelines de données**. 
+
+Dans cette leçon, vous apprendrez **pourquoi partitionner vos assets de données** et comment le faire avec Dagster en partitionnant les données des trajets de taxi.
+
+---
+
+### Partitions et Backfills dans Dagster
+
+#### Qu'est-ce qu'une partition ?
+
+Les partitions permettent de diviser les données en segments plus petits et plus faciles à manipuler. Cette segmentation offre plusieurs avantages :
+
+- **Efficacité des coûts** : Ne traiter que les données nécessaires, stocker les plus récentes dans un stockage rapide et les plus anciennes dans un stockage moins coûteux.
+- **Accélération du calcul** : Répartir un grand ensemble de données en parties plus petites améliore les performances des requêtes.
+- **Scalabilité** : Distribuer les données sur plusieurs serveurs ou systèmes de stockage, ou exécuter plusieurs partitions en parallèle.
+- **Traitement concurrent** : Exécuter plusieurs partitions simultanément pour accélérer le traitement.
+- **Débogage rapide** : Tester une partition individuelle avant d'exécuter des analyses sur des plages de données plus larges.
+
+Les partitions sont à la fois un **modèle conceptuel** et une **représentation physique**. Dans Dagster, une seule définition d’asset peut contenir plusieurs partitions. 
+
+Par exemple, si nous stockons des commandes de cookies dans une base de données, elles peuvent être toutes dans une même table `orders`. En revanche, si elles sont stockées sur AWS S3 en fichiers parquet, il peut être plus efficace de créer un fichier parquet **par jour**.
+
+En résumé, **les partitions permettent de manipuler des segments spécifiques de données tout en laissant flexibles les méthodes de stockage et d'accès**.
+
+#### Qu'est-ce qu'un Backfill ?
+
+Un **backfill** est le processus d'exécution des partitions d'assets qui n'existent pas encore ou qui nécessitent une mise à jour.
+
+Les backfills sont couramment utilisés lors de la mise en place d'un pipeline pour la première fois, car les assets doivent être matérialisés pour refléter les données historiques.
+
+Autres cas d'utilisation :
+- **Modification de la logique d'un asset** : Si l'algorithme de transformation des données change, un backfill permet de recalculer les valeurs historiques.
+- **Rattrapage des partitions manquantes** : Si certaines partitions n’ont pas été générées en raison d'une erreur, un backfill les régénère.
+
+🚀 **Dans la section suivante, vous apprendrez à partitionner un asset dans Dagster !**
