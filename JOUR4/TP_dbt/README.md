@@ -229,7 +229,7 @@ Les fichiers de données sont fournis dans ce dépôt, sous `data/`. Vous pouvez
    
    {% endsnapshot %}
    ```
-2. **Exécuter** :
+2. **Exécuter** 
    ```sh
    dbt snapshot
    ```
