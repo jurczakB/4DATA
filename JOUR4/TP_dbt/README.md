@@ -39,6 +39,7 @@ Les fichiers de données sont fournis dans ce dépôt, sous `data/`. Vous pouvez
 
 💡 **Indice** : DBT doit être configuré avec un type de connexion **DuckDB** et un chemin de stockage local pour la base de données.
 
+
 1. **Créer un nouveau projet DBT** :
    ```sh
    dbt init tp_dbt
