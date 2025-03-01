@@ -9,8 +9,8 @@ Ce cours **4DATA** a pour objectif de vous fournir une compréhension approfondi
 ## 🎯 Compétences Acquises
 
 À l’issue de ce cours, vous serez capable de :
-✅ Comprendre les différentes **composantes d'un pipeline de données**.
-✅ Concevoir et mettre en œuvre un **pipeline robuste et performant**.
+- ✅ Comprendre les différentes **composantes d'un pipeline de données**.
+- ✅ Concevoir et mettre en œuvre un **pipeline robuste et performant**.
 ✅ Explorer les **technologies et frameworks** les plus utilisés en entreprise.
 ✅ Appliquer les **bonnes pratiques** pour assurer la **qualité et la fiabilité des données**.
 
