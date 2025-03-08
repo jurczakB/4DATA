@@ -39,6 +39,27 @@ Les fichiers de données sont fournis dans ce dépôt, sous `data/`. Vous pouvez
 
 💡 **Indice** : DBT doit être configuré avec un type de connexion **DuckDB** et un chemin de stockage local pour la base de données.
 
+
+1. **Créer un nouveau projet DBT** :
+   ```sh
+   dbt init tp_dbt
+   cd tp_dbt
+   ```
+2. **Configurer DBT pour fonctionner en local avec DuckDB** (un moteur SQL léger basé sur des fichiers) :
+   Modifier le fichier `~/.dbt/profiles.yml` :
+   ```yaml
+   tp_dbt:
+     outputs:
+       dev:
+         type: duckdb
+         path: data/shop_sphere.db  # Stocke les données localement
+     target: dev
+   ```
+3. **Tester la connexion locale** :
+   ```sh
+   dbt debug
+   ```
+
 ---
 
 ## 📝 Partie 2 - Chargement des données sources
@@ -50,6 +71,22 @@ Les fichiers de données sont fournis dans ce dépôt, sous `data/`. Vous pouvez
 3. **Chargez ces fichiers pour les rendre accessibles sous forme de tables locales.**
 
 💡 **Indice** : Les fichiers CSV doivent être déclarés comme `seeds` dans DBT et peuvent être utilisés directement dans les modèles.
+
+1. **Créer un dossier `seeds/` et y placer les fichiers CSV**
+2. **Déclarer les sources dans `models/sources.yml`** :
+   ```yaml
+   version: 2
+   sources:
+     - name: raw_data
+       tables:
+         - name: orders
+         - name: customers
+         - name: products
+   ```
+3. **Charger les fichiers CSV en tant que tables locales avec DBT** :
+   ```sh
+   dbt seed
+   ```
 
 ---
 
@@ -63,6 +100,22 @@ Les fichiers de données sont fournis dans ce dépôt, sous `data/`. Vous pouvez
 
 💡 **Aide** : Un modèle de staging est un fichier SQL qui récupère et nettoie les données brutes avant de les transformer.
 
+1. **Créer un modèle `models/staging/stg_orders.sql`** :
+   ```sql
+   SELECT * FROM {{ source('raw_data', 'orders') }}
+   ```
+2. **Créer un modèle `models/staging/stg_customers.sql`** :
+   ```sql
+   SELECT * FROM {{ source('raw_data', 'customers') }}
+   ```
+3. **Créer un modèle `models/staging/stg_products.sql`** :
+   ```sql
+   SELECT * FROM {{ source('raw_data', 'products') }}
+   ```
+4. **Exécuter les modèles** :
+   ```sh
+   dbt run
+   ```
 
 ### 🔹 Étape 5 : Création d’un modèle analytique
 1. **Créez un modèle `sales_analysis.sql` qui relie les commandes aux clients et aux produits.**
@@ -70,6 +123,24 @@ Les fichiers de données sont fournis dans ce dépôt, sous `data/`. Vous pouvez
 3. **Exécutez ce modèle et validez les résultats.**
 
 💡 **Indice** : Vous devez utiliser `JOIN` pour relier les commandes, les clients et les produits à l’aide des `customer_id` et `product_id`.
+
+1. **Créer un modèle `models/marts/sales_analysis.sql`** :
+   ```sql
+   SELECT
+       o.order_id,
+       c.customer_name,
+       p.product_name,
+       o.quantity,
+       o.total_amount,
+       o.order_date
+   FROM {{ ref('stg_orders') }} o
+   JOIN {{ ref('stg_customers') }} c ON o.customer_id = c.customer_id
+   JOIN {{ ref('stg_products') }} p ON o.product_id = p.product_id
+   ```
+2. **Exécuter les modèles** et vérifier la sortie :
+   ```sh
+   dbt run
+   ```
 
 ---
 
@@ -82,11 +153,36 @@ Les fichiers de données sont fournis dans ce dépôt, sous `data/`. Vous pouvez
 
 💡 **Aide** : Les tests peuvent être définis dans `schema.yml` et exécutés avec DBT.
 
+1. **Déclarer des tests dans `models/schema.yml`** :
+   ```yaml
+   version: 2
+   models:
+     - name: stg_orders
+       columns:
+         - name: order_id
+           tests:
+             - unique
+             - not_null
+   ```
+2. **Exécuter les tests** :
+   ```sh
+   dbt test
+   ```
+
 ### 🔹 Étape 7 : Générer la documentation
 1. **Ajoutez des descriptions aux modèles et aux colonnes pour améliorer la documentation.**
 2. **Générez la documentation et visualisez-la dans un navigateur.**
 
 💡 **Indice** : DBT permet de générer une documentation interactive pour explorer la structure des données.
+
+1. **Générer la documentation interactive** :
+   ```sh
+   dbt docs generate
+   ```
+2. **Lancer un serveur local pour visualiser la documentation** :
+   ```sh
+   dbt docs serve
+   ```
 
 ---
 
@@ -99,11 +195,45 @@ Les fichiers de données sont fournis dans ce dépôt, sous `data/`. Vous pouvez
 
 💡 **Indice** : Utilisez `is_incremental()` pour ne récupérer que les nouvelles lignes depuis la dernière exécution.
 
+1. **Modifier `sales_analysis.sql` pour qu’il charge les nouvelles commandes uniquement** :
+   ```sql
+   {{ config(materialized='incremental', unique_key='order_id') }}
+   
+   SELECT * FROM {{ ref('stg_orders') }}
+   {% if is_incremental() %}
+       WHERE order_date > (SELECT MAX(order_date) FROM {{ this }})
+   {% endif %}
+   ```
+2. **Exécuter** :
+   ```sh
+   dbt run
+   ```
+
 ### 🔹 Étape 9 : Ajouter un snapshot pour suivre l’évolution des clients
 1. **Créez un snapshot permettant de suivre les modifications des noms des clients au fil du temps.**
 2. **Exécutez le snapshot et observez les versions des enregistrements stockées.**
 
 💡 **Aide** : Les snapshots permettent de suivre les changements des données sources en stockant plusieurs versions des enregistrements.
+
+1. **Créer `snapshots/customer_snapshot.sql`** :
+   ```sql
+   {% snapshot customer_snapshot %}
+   
+   {{ config(
+       target_schema='snapshots',
+       unique_key='customer_id',
+       strategy='check',
+       check_cols=['customer_name']
+   ) }}
+   
+   SELECT * FROM {{ source('raw_data', 'customers') }}
+   
+   {% endsnapshot %}
+   ```
+2. **Exécuter** 
+   ```sh
+   dbt snapshot
+   ```
 
 ---
 
