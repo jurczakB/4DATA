@@ -1,0 +1,47 @@
+2025-03-13 14:55:45,690:INFO:Starting ETL process...
+2025-03-13 14:55:45,691:INFO:Fetching data from API: https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd
+2025-03-13 14:55:45,912:INFO:Data successfully saved to ./data/raw/api_data.json
+2025-03-13 14:55:45,912:INFO:Data extraction successful.
+2025-03-13 14:55:45,913:INFO:Reading data from ./data/raw/api_data.json
+2025-03-13 14:55:45,955:INFO:Cleaned data saved to ./data/processed/clean_data.csv
+2025-03-13 14:55:45,956:INFO:Data transformation successful.
+2025-03-13 14:55:45,956:INFO:Connecting to PostgreSQL database
+2025-03-13 14:55:45,970:ERROR:Error while loading data to PostgreSQL: connection to server at "postgres_db" (172.18.0.2), port 5432 failed: FATAL:  the database system is starting up
+
+2025-03-13 14:55:45,971:INFO:Data loading to PostgreSQL successful.
+2025-03-13 14:55:45,971:INFO:Generating visualization from PostgreSQL data
+2025-03-13 14:55:46,034:ERROR:Error while generating visualization: (psycopg2.errors.UndefinedTable) relation "crypto_data" does not exist
+LINE 1: SELECT name, market_cap FROM crypto_data ORDER BY market_cap...
+                                     ^
+
+[SQL: SELECT name, market_cap FROM crypto_data ORDER BY market_cap DESC LIMIT 10]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-03-13 14:55:46,034:INFO:Visualization generated successfully.
+2025-03-13 14:56:26,444:INFO:Starting ETL process...
+2025-03-13 14:56:26,445:INFO:Fetching data from API: https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd
+2025-03-13 14:56:26,510:INFO:Data successfully saved to ./data/raw/api_data.json
+2025-03-13 14:56:26,511:INFO:Data extraction successful.
+2025-03-13 14:56:26,511:INFO:Reading data from ./data/raw/api_data.json
+2025-03-13 14:56:26,538:INFO:Cleaned data saved to ./data/processed/clean_data.csv
+2025-03-13 14:56:26,538:INFO:Data transformation successful.
+2025-03-13 14:56:26,539:INFO:Connecting to PostgreSQL database
+2025-03-13 14:56:26,578:INFO:Table 'crypto_data' is ready
+2025-03-13 14:56:26,620:INFO:Data from ./data/processed/clean_data.csv successfully loaded into PostgreSQL
+2025-03-13 14:56:26,621:INFO:Data loading to PostgreSQL successful.
+2025-03-13 14:56:26,621:INFO:Generating visualization from PostgreSQL data
+2025-03-13 14:56:26,885:INFO:Visualization saved to ./data/outputs/graph.png
+2025-03-13 14:56:26,886:INFO:Visualization generated successfully.
+2025-03-13 14:58:13,566:INFO:Starting ETL process...
+2025-03-13 14:58:13,567:INFO:Fetching data from API: https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd
+2025-03-13 14:58:13,646:INFO:Data successfully saved to ./data/raw/api_data.json
+2025-03-13 14:58:13,647:INFO:Data extraction successful.
+2025-03-13 14:58:13,647:INFO:Reading data from ./data/raw/api_data.json
+2025-03-13 14:58:13,676:INFO:Cleaned data saved to ./data/processed/clean_data.csv
+2025-03-13 14:58:13,677:INFO:Data transformation successful.
+2025-03-13 14:58:13,677:INFO:Connecting to PostgreSQL database
+2025-03-13 14:58:13,692:INFO:Table 'crypto_data' is ready
+2025-03-13 14:58:13,741:INFO:Data from ./data/processed/clean_data.csv successfully loaded into PostgreSQL
+2025-03-13 14:58:13,742:INFO:Data loading to PostgreSQL successful.
+2025-03-13 14:58:13,742:INFO:Generating visualization from PostgreSQL data
+2025-03-13 14:58:13,981:INFO:Visualization saved to ./data/outputs/graph.png
+2025-03-13 14:58:13,982:INFO:Visualization generated successfully.

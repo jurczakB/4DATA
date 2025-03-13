@@ -1,381 +1,684 @@
-# 🚀 TP : Conteneurisation d'un Pipeline de Données avec Docker
+# TP : Introduction à Python et ses bibliothèques pour la manipulation de données
 
-## 📌 Partie 1 : Introduction et Mise en Place de Docker
+## Objectif
 
-### 🎯 Objectif
-L'objectif de cette première partie est de **découvrir Docker**, comprendre ses **concepts fondamentaux**, et **maîtriser les commandes de base**. À la fin de cette section, l’étudiant saura :
-- Installer et configurer Docker.
-- Comprendre les concepts clés : images, conteneurs, volumes, réseaux.
-- Utiliser les commandes Docker essentielles.
-- Manipuler et gérer des conteneurs.
+Ce TP a pour but de vous familiariser avec **Python** et les bibliothèques fondamentales utilisées dans les pipelines de données. Vous apprendrez à manipuler des fichiers CSV et JSON, à utiliser **NumPy** et **Pandas** pour le traitement des données tabulaires et à interagir avec **SQLite** via SQLAlchemy.
 
----
+Nous allons structurer le projet selon une arborescence bien définie pour organiser les fichiers et scripts.
 
-## 🏗️ 1. Installation de Docker et Docker Compose
+## Arborescence du projet
 
-### 🔹 Sous Windows / macOS
+Voici l'arborescence recommandée :
 
-1. Télécharger **Docker Desktop** : [Docker Desktop](https://www.docker.com/products/docker-desktop/).
-2. Installer le logiciel en suivant les instructions de l'installateur.
-3. Démarrer Docker Desktop et vérifier que Docker fonctionne avec :
-
-   ```sh
-   docker --version
-   docker-compose --version
-   ```
-
-4. Activer **WSL 2 backend** sous Windows si nécessaire (voir la documentation officielle de Docker).
-
-### 🔹 Sous Linux (Ubuntu/Debian)
-
-1. **Mettre à jour le système** :
-   ```sh
-   sudo apt update && sudo apt upgrade -y
-   ```
-2. **Installer les paquets nécessaires** :
-   ```sh
-   sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
-   ```
-3. **Ajouter la clé GPG et le dépôt officiel Docker** :
-   ```sh
-   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-   sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-   ```
-4. **Installer Docker CE (Community Edition)** :
-   ```sh
-   sudo apt update
-   sudo apt install -y docker-ce docker-ce-cli containerd.io
-   ```
-5. **Vérifier l'installation** :
-   ```sh
-   docker --version
-   docker-compose --version
-   ```
-6. **Ajouter l'utilisateur actuel au groupe Docker pour éviter d'utiliser `sudo` à chaque commande** :
-   ```sh
-   sudo usermod -aG docker $USER
-   ```
-7. **Redémarrer la session** pour appliquer les modifications.
-
----
-
-## 🔍 2. Concepts Clés de Docker
-
-### 🛠️ Image Docker
-
-Une **image Docker** est un modèle utilisé pour créer un conteneur. Elle contient tout le nécessaire pour exécuter une application :
-
-- Système de fichiers.
-- Dépendances.
-- Code source.
-
-**Commande pour télécharger une image** :
-```sh
-docker pull nginx
-```
-
-**Lister les images disponibles** :
-```sh
-docker images
-```
-
-**Supprimer une image** :
-```sh
-docker rmi <image_id>
-```
-
-### 📦 Conteneur Docker
-
-Un **conteneur** est une instance exécutable d’une image. Il peut être démarré, arrêté et supprimé sans affecter l’image de base.
-
-**Créer et exécuter un conteneur** :
-```sh
-docker run -d --name my_nginx -p 8080:80 nginx
-```
-
-**Lister les conteneurs en cours d’exécution** :
-```sh
-docker ps
-```
-
-**Arrêter et supprimer un conteneur** :
-```sh
-docker stop my_nginx
-
-docker rm my_nginx
-```
-
-### 🛜 Réseaux Docker
-
-Docker utilise des réseaux pour permettre aux conteneurs de communiquer entre eux.
-
-**Lister les réseaux existants** :
-```sh
-docker network ls
-```
-
-**Créer un réseau personnalisé** :
-```sh
-docker network create my_network
-```
-
-**Démarrer un conteneur en l’attachant à un réseau** :
-```sh
-docker run -d --name my_app --network my_network nginx
-```
-
-### 📂 Volumes et Persistance des Données
-
-Les **volumes Docker** permettent de stocker des données qui persistent après l'arrêt d'un conteneur.
-
-**Créer un volume** :
-```sh
-docker volume create my_volume
-```
-
-**Monter un volume dans un conteneur** :
-```sh
-docker run -d -v my_volume:/app/data --name data_container nginx
-```
-
-**Vérifier l’utilisation des volumes** :
-```sh
-docker volume ls
+```bash
+python-data-pipeline/
+├── data/
+│   ├── input/
+│   │   ├── sample.csv
+│   │   ├── sample.json
+│   ├── output/
+│   │   ├── filtered_data.csv
+│   │   ├── transformed.json
+├── scripts/
+│   ├── load_csv.py
+│   ├── manipulate_json.py
+│   ├── pandas_analysis.py
+│   ├── sqlite_interaction.py
+│   ├── scheduler.py
+├── requirements.txt
+├── README.md
 ```
 
 ---
 
-## 🚀 3. Exercices Pratiques
+## 1. Installation et configuration de l'environnement
 
-### Exercice 1 : Création et manipulation d’un conteneur
+Avant de commencer, assurez-vous que **Python 3.8+** est installé sur votre machine. 
 
-✅ Téléchargez et exécutez une image Alpine Linux en mode interactif :
+### Installation de l'environnement virtuel
+
 ```sh
-docker run -it alpine sh
+# Création d'un environnement virtuel
+python3 -m venv venv
+
+# Activation (Windows)
+venv\Scripts\activate
+
+# Activation (Mac/Linux)
+source venv/bin/activate
 ```
-✅ Testez quelques commandes Linux à l’intérieur du conteneur (ex: `ls`, `pwd`, `echo "Hello Docker"`).
-✅ Sortez du conteneur (`exit`) et essayez de le redémarrer :
+
+### Installation des bibliothèques nécessaires
+
 ```sh
-docker start <container_id>
+pip install numpy pandas matplotlib seaborn jupyter notebook sqlalchemy sqlite3
 ```
-✅ Supprimez le conteneur et l’image.
+
+Ajoutez ces dépendances dans `requirements.txt` pour garder une trace des packages installés :
+
+```sh
+pip freeze > requirements.txt
+```
+---
+
+## 2. Bases de Python 
+
+### 2.1. Structures de données
+
+#### Listes
+```python
+fruits = ["pomme", "banane", "cerise"]
+fruits.append("orange")
+print(fruits[0])  # pomme
+```
+
+#### Dictionnaires
+```python
+personne = {"nom": "Alice", "age": 25, "ville": "Paris"}
+print(personne["nom"])  # Alice
+personne["age"] = 26  # Modification
+```
+
+#### Boucles et conditions
+```python
+for fruit in fruits:
+    print(fruit)
+
+if "pomme" in fruits:
+    print("Il y a une pomme !")
+```
+
+#### Fonctions
+```python
+def carre(x):
+    return x * x
+
+print(carre(4))  # 16
+```
 
 ---
 
-### Exercice 2 : Déploiement d’un serveur web Nginx
+## 3. Manipulation de fichiers CSV et JSON
 
-✅ **Lancez un serveur Nginx** exposé sur le port 8080 :
-```sh
-docker run -d --name webserver -p 8080:80 nginx
+### 3.1. Lecture et écriture de fichiers CSV
+
+```python
+import csv
+
+# Lecture CSV
+with open("data/input/data.csv", newline="") as file:
+    reader = csv.reader(file)
+    for row in reader:
+        print(row)
 ```
-✅ **Ouvrez un navigateur et accédez à** `http://localhost:8080`.
-✅ **Modifiez la page d’accueil** en créant un volume :
-```sh
-docker run -d --name webserver -p 8080:80 -v $(pwd)/html:/usr/share/nginx/html nginx
+
+```python
+# Écriture CSV
+with open("data/output/output.csv", "w", newline="") as file:
+    writer = csv.writer(file)
+    writer.writerow(["Nom", "Age"])
+    writer.writerow(["Alice", 25])
 ```
-✅ **Vérifiez que les changements sont appliqués**.
+
+### 3.2. Manipulation de JSON
+
+```python
+import json
+
+# Lecture JSON
+with open("data/input/data.json", "r") as file:
+    data = json.load(file)
+    print(data)
+
+# Écriture JSON
+data = {"nom": "Alice", "age": 25}
+with open("data/output/output.json", "w") as file:
+    json.dump(data, file, indent=4)
+```
 
 ---
 
-📌 **Dans cette première partie, nous avons appris à :**
+## 4. Manipulation des données avec Pandas
 
-✅ Installer Docker et Docker Compose.
-✅ Comprendre les concepts fondamentaux : images, conteneurs, volumes, réseaux.
-✅ Exécuter et manipuler des conteneurs avec les commandes essentielles.
-✅ Déployer un serveur web avec Docker.
+### 4.1. Chargement et affichage des données
 
-🔜 **Dans la partie suivante**, nous allons **conteneuriser une base de données** et la rendre persistante. 🚀
+```python
+import pandas as pd
+
+# Charger un CSV
+df = pd.read_csv("data/input/data.csv")
+print(df.head())
+```
+
+### 4.2. Sélection et filtrage
+
+```python
+# Sélection d'une colonne
+print(df["Nom"])
+
+# Filtrage
+df_filtre = df[df["Age"] > 25]
+print(df_filtre)
+```
+
+### 4.3. Manipulation et transformations
+
+```python
+# Ajouter une colonne
+df["Année de naissance"] = 2023 - df["Age"]
+```
+
+```python
+# Supprimer une colonne
+df.drop(columns=["Adresse"], inplace=True)
+```
+
+### 4.4. Agrégation et statistiques
+
+```python
+# Statistiques
+df.describe()
+
+# Grouper par ville
+print(df.groupby("Ville")["Age"].mean())
+```
 
 ---
 
-## 3. Conteneurisation d'une Base de Données
+## 5. NumPy pour les calculs numériques
 
-### Objectif
+```python
+import numpy as np
 
-L'objectif de cette section est d'apprendre à **déployer et gérer une base de données relationnelle dans un conteneur Docker**. Points clés
+arr = np.array([1, 2, 3, 4, 5])
+print(arr * 2)
+print(np.mean(arr))
+```
 
-- Déployer une base de données relationnelle (PostgreSQL, MySQL...)
-- Configurer la persistance des données avec Docker Volumes
-- Se connecter à la base depuis un client SQL
-- Sécuriser la base de données
+---
 
-### Instructions
+## 6. Introduction à SQLite et SQLAlchemy
 
-1. **Choisir une base de données**
+### 6.1. Connexion à SQLite
 
-   - Rechercher une image officielle Docker pour une base de données comme PostgreSQL ou MySQL.
-   - Lire la documentation pour comprendre les variables d’environnement nécessaires (ex: utilisateur, mot de passe, nom de la base).
+```python
+from sqlalchemy import create_engine
+engine = create_engine("sqlite:///data/database.db")
+connection = engine.connect()
+```
 
-2. **Lancer un conteneur pour la base de données**
+### 6.2. Création d'une table et insertion de données
 
-   - Démarrer un conteneur en exposant les ports et en définissant les paramètres de connexion.
-   - Vérifier que le conteneur est bien en cours d’exécution.
+```python
+connection.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    age INTEGER
+)
+""")
+connection.execute("""
+INSERT INTO users (name, age) VALUES ('Alice', 25), ('Bob', 30)
+""")
+```
 
-3. **Tester la connexion à la base de données**
+### 6.3. Lecture avec Pandas
 
-   - Se connecter avec un client SQL (ex: `psql` pour PostgreSQL, `mysql` pour MySQL).
-   - Créer une table et insérer des données.
-   - Vérifier la persistance des données après le redémarrage du conteneur.
+```python
+df = pd.read_sql("SELECT * FROM users", con=engine)
+print(df)
+```
 
-4. **Ajouter la persistance des données**
+---
 
-   - Modifier le conteneur pour stocker les données dans un volume Docker.
-   - Tester la récupération des données après l’arrêt et la relance du conteneur.
+## Exercices
 
-5. **Sécurisation de la base de données**
+1. **Créer un script Python** qui charge un CSV, filtre les lignes et enregistre le résultat.
+2. **Manipuler JSON** : lire et écrire un fichier JSON.
+3. **Utiliser Pandas** pour grouper et analyser un dataset.
+4. **Interagir avec SQLite** via SQLAlchemy.
 
-   - Définir des règles d’accès restrictives.
-   - Scanner les vulnérabilités de l’image Docker utilisée.
-   - Tester l’accès distant et les configurations réseau.
+---
 
-### Pistes et Indices
+---
 
-- Pour trouver l’image officielle, consultez Docker Hub : [https://hub.docker.com/](https://hub.docker.com/)
-- Vérifiez les logs du conteneur pour résoudre les erreurs :
+## Etape 0: Analyse exploratoire des données
+
+Avant de commencer à manipuler les données avec Python et Pandas, il est essentiel de comprendre leur structure et leur contenu. Cette première étape consiste à charger les datasets et effectuer une analyse exploratoire.
+
+### Objectifs :
+- Charger les fichiers de données (`sales_data.csv`, `customers.csv`, `orders.json`)
+- Vérifier la structure des datasets (types de colonnes, valeurs manquantes, doublons, etc.)
+- Analyser les statistiques descriptives
+- Visualiser les distributions et les relations entre variables
+
+### 1. Charger les fichiers de données
+
+Utiliser Pandas pour charger les fichiers et afficher les premières lignes :
+
+```python
+import pandas as pd
+
+# Charger les fichiers CSV
+df_sales = pd.read_csv("data/sales_data.csv")
+df_customers = pd.read_csv("data/customers.csv")
+
+# Charger le fichier JSON
+df_orders = pd.read_json("data/orders.json")
+
+# Aperçu des données
+print(df_sales.head())
+print(df_customers.head())
+print(df_orders.head())
+```
+
+### 2. Vérifier la structure des données
+
+Afficher les types de colonnes et identifier les valeurs manquantes :
+
+```python
+# Vérifier la structure des datasets
+print(df_sales.info())
+print(df_customers.info())
+print(df_orders.info())
+
+# Vérifier les valeurs manquantes
+print(df_sales.isnull().sum())
+print(df_customers.isnull().sum())
+print(df_orders.isnull().sum())
+```
+
+### 3. Analyser les statistiques descriptives
+
+Obtenir des résumés statistiques pour les colonnes numériques :
+
+```python
+# Statistiques descriptives
+df_sales.describe()
+df_customers.describe()
+df_orders.describe()
+```
+
+### 4. Visualiser les données
+
+Créer des graphiques pour explorer les distributions et les relations entre variables :
+
+```python
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Histogramme des montants de ventes
+plt.figure(figsize=(10, 5))
+sns.histplot(df_sales["total_amount"], bins=30, kde=True)
+plt.title("Distribution des montants de ventes")
+plt.show()
+
+# Répartition des commandes par pays
+plt.figure(figsize=(12, 5))
+df_customers["country"].value_counts().plot(kind="bar")
+plt.title("Nombre de clients par pays")
+plt.xticks(rotation=45)
+plt.show()
+```
+---
+
+Cette première partie est essentielle pour comprendre les bases avant d'aborder la **construction de pipelines de données** dans la suite du TP.
+
+## 1. Chargement et manipulation de fichiers CSV
+
+### Objectif :
+Charger un fichier CSV, appliquer des filtres et sauvegarder un nouveau fichier transformé.
+
+### Fichier : `scripts/load_csv.py`
+
+### Exercices pratiques :
+
+1. **Charger un fichier CSV en DataFrame avec Pandas.**
+   ```python
+   import pandas as pd
+   df = pd.read_csv("data/sales_data.csv")
+   print(df.head())
+   ```
+
+2. **Filtrer les lignes selon une condition donnée (ex: garder uniquement les valeurs supérieures à 500 dans une colonne `total_amount`).**
+   ```python
+   df_filtered = df[df['total_amount'] > 500]
+   print(df_filtered.head())
+   ```
+
+3. **Remplacer les valeurs manquantes d’une colonne par la moyenne des valeurs existantes.**
+   ```python
+   df['total_amount'].fillna(df['total_amount'].mean(), inplace=True)
+   ```
+
+4. **Renommer certaines colonnes du fichier CSV.**
+   ```python
+   df.rename(columns={'old_column': 'new_column'}, inplace=True)
+   ```
+
+5. **Trier le DataFrame par plusieurs colonnes.**
+   ```python
+   df_sorted = df.sort_values(by=['customer_id', 'total_amount'], ascending=[True, False])
+   ```
+
+6. **Sauvegarder le DataFrame filtré dans un fichier `filtered_data.csv`.**
+   ```python
+   df_filtered.to_csv("data/output/filtered_data.csv", index=False)
+   ```
+
+---
+
+## 2. Lecture et manipulation de fichiers JSON
+
+### Objectif :
+Lire un fichier JSON, modifier son contenu, et sauvegarder un fichier transformé.
+
+### Fichier : `scripts/manipulate_json.py`
+
+### Exercices pratiques :
+
+1. **Charger un fichier JSON en Python.**
+   ```python
+   import json
+   with open("data/customers.json") as f:
+       data = json.load(f)
+   ```
+
+2. **Modifier une clé spécifique d’un dictionnaire JSON.**
+   ```python
+   data["customer_name"] = "John Doe"
+   ```
+
+3. **Ajouter un nouvel élément à un fichier JSON.**
+   ```python
+   data["new_key"] = "new_value"
+   ```
+
+4. **Supprimer une clé spécifique du fichier JSON.**
+   ```python
+   del data["old_key"]
+   ```
+
+5. **Convertir un fichier JSON en DataFrame Pandas.**
+   ```python
+   import pandas as pd
+   df = pd.DataFrame.from_dict(data)
+   ```
+
+6. **Sauvegarder les modifications dans un fichier `transformed.json`.**
+   ```python
+   with open("data/output/transformed.json", "w") as f:
+       json.dump(data, f, indent=4)
+   ```
+
+---
+
+## 3. Analyse de données avec Pandas
+
+### Objectif :
+Charger un dataset et réaliser des statistiques descriptives.
+
+### Fichier : `scripts/pandas_analysis.py`
+
+### Exercices pratiques :
+
+1. **Charger un dataset et afficher ses informations générales.**
+   ```python
+   df.info()
+   df.describe()
+   ```
+
+2. **Grouper les données par une colonne et calculer la moyenne d’une autre colonne.**
+   ```python
+   df_grouped = df.groupby('customer_id')['total_amount'].mean()
+   ```
+
+3. **Filtrer un DataFrame pour afficher uniquement certaines valeurs.**
+   ```python
+   df_filtered = df[df['country'] == 'France']
+   ```
+
+4. **Fusionner deux DataFrames en utilisant une clé commune.**
+   ```python
+   df_merged = pd.merge(df_customers, df_sales, on='customer_id')
+   ```
+
+5. **Créer une nouvelle colonne calculée à partir d’autres colonnes.**
+   ```python
+   df['total_with_tax'] = df['total_amount'] * 1.2
+   ```
+
+6. **Générer un histogramme d’une colonne spécifique.**
+   ```python
+   import matplotlib.pyplot as plt
+   df['total_amount'].hist()
+   plt.show()
+   ```
+
+---
+
+## 4. Interagir avec SQLite via SQLAlchemy
+
+### Objectif :
+Créer une base de données SQLite, insérer des données et les manipuler avec SQLAlchemy.
+
+### Fichier : `scripts/sqlite_interaction.py`
+
+### Exercices pratiques :
+
+1. **Créer une base de données SQLite et une table avec SQLAlchemy.**
+   ```python
+   from sqlalchemy import create_engine, Column, Integer, String, Float, MetaData, Table
+   engine = create_engine("sqlite:///data/database.db")
+   metadata = MetaData()
+   customers = Table('customers', metadata,
+       Column('id', Integer, primary_key=True),
+       Column('name', String),
+       Column('total_spent', Float)
+   )
+   metadata.create_all(engine)
+   ```
+
+2. **Insérer plusieurs lignes de données dans une table.**
+   ```python
+   from sqlalchemy.orm import sessionmaker
+   Session = sessionmaker(bind=engine)
+   session = Session()
+   session.execute(customers.insert().values(id=1, name="Alice", total_spent=200.0))
+   session.commit()
+   ```
+
+3. **Exécuter une requête SELECT pour récupérer toutes les données d’une table.**
+   ```python
+   result = session.execute(customers.select()).fetchall()
+   for row in result:
+       print(row)
+   ```
+
+4. **Filtrer les résultats d’une requête SQLAlchemy.**
+   ```python
+   result = session.execute(customers.select().where(customers.c.total_spent > 100)).fetchall()
+   ```
+
+5. **Mettre à jour une entrée spécifique dans la base de données.**
+   ```python
+   session.execute(customers.update().where(customers.c.id == 1).values(total_spent=300.0))
+   session.commit()
+   ```
+
+6. **Convertir le résultat d’une requête SQL en DataFrame Pandas.**
+   ```python
+   import pandas as pd
+   df = pd.read_sql("SELECT * FROM customers", engine)
+   ```
+
+   ---
+
+## 3. Création de pipelines de données (ETL)
+
+### Objectif :
+Créer une première pipeline ETL permettant d’extraire, transformer et charger des données en automatisant les tâches. Ci-après figurent des indications et des pistes avec des extraits de code. Cependant, c'est à vous de bien stucturer les étapes de cette première pipeline en utilisant les bonnes pratiques vues durant le cours (fonctions réutilisables, logs, documentation des fonctions, utiliser les bons scripts python pour la bonne action,...)
+
+### Structure du pipeline :
+Le pipeline sera structuré en trois étapes principales :
+1. **Extraction** : Charger des fichiers CSV et JSON en DataFrame.
+2. **Transformation** : Nettoyage et enrichissement des données.
+3. **Chargement** : Sauvegarde des données dans une base SQLite.
+
+### Fichier : `scripts/etl_pipeline.py`
+
+### Étapes de la pipeline :
+
+#### 1. Extraction des données
+
+```python
+import pandas as pd
+import json
+
+def extract_csv(file_path):
+    return pd.read_csv(file_path)
+
+def extract_json(file_path):
+    with open(file_path, "r") as f:
+        return pd.DataFrame(json.load(f))
+
+sales_data = extract_csv("data/sales_data.csv")
+customers_data = extract_json("data/customers.json")
+```
+
+#### 2. Transformation des données
+
+```python
+# Nettoyage des données
+sales_data.dropna(inplace=True)
+sales_data = sales_data[sales_data['total_amount'] > 0]
+
+# Fusion avec les données clients
+merged_data = pd.merge(sales_data, customers_data, on='customer_id', how='left')
+
+# Création d’une nouvelle colonne
+merged_data['total_with_tax'] = merged_data['total_amount'] * 1.2
+```
+
+#### 3. Chargement des données dans SQLite
+
+```python
+from sqlalchemy import create_engine
+
+engine = create_engine("sqlite:///data/database.db")
+merged_data.to_sql("sales_data", con=engine, if_exists="replace", index=False)
+```
+
+#### 4. Planification de l'exécution (Scheduling)
+
+Un pipeline ETL peut être automatisé à l'aide de `cron` sous Linux ou d'un planificateur de tâches sous Windows.
+
+**Exemple de configuration avec `cron` :**
+
+Ouvrir le crontab avec la commande :
+```bash
+crontab -e
+```
+
+Ajouter une ligne pour exécuter le script tous les jours à minuit :
+```bash
+0 0 * * * /usr/bin/python3 /chemin/vers/le_projet/scripts/etl_pipeline.py
+```
+
+**Sur Windows, utiliser le planificateur de tâches :**
+- Créer une nouvelle tâche
+- Sélectionner "Exécuter un programme"
+- Ajouter `python.exe` comme programme et `C:\chemin\vers\le_projet\scripts\etl_pipeline.py` comme argument.
+
+---
+
+### Conclusion
+Cette première pipeline de données permet d’acquérir les bases de la manipulation et de l’automatisation des traitements de données. Elle sera la base des prochaines étapes, où nous intégrerons des outils avancés comme **Apache Airflow** ou **Dagster** pour orchestrer et surveiller les pipelines de données de manière plus robuste.
+
+📌 **Prochaine étape :** Améliorer la pipeline en ajoutant des logs et la gestion des erreurs pour rendre l’automatisation plus fiable.
+
+--- 
+
+# Creation d'une pipeline de données plus avancée
+
+## Objectif
+L'objectif de cette partie du TP est de construire un **pipeline de donnees** plus complexe en **récupérant des données depuis une API**, en les **nettoyant et structurant**, puis en **les intégrant dans une base de données**. Enfin, nous ajouterons une **étape de visualisation** et planifierons son exécution automatique.
+
+## 1. Extraction des données depuis une API
+### 📌 Tâches à accomplir
+- Identifier une API publique fournissant des données pertinentes (ex: OpenWeatherMap, CoinGecko, etc.).
+- Effectuer une **requête GET** pour récupérer les données en JSON.
+- Enregistrer la réponse dans un fichier JSON local (`data/raw/api_data.json`).
+
+### 📍 Fichier : `scripts/extract_api.py`
+
+💡 **Guides pratiques :**
+- Utiliser la librairie `requests` pour effectuer un appel API.
+- Vérifier le **code de statut HTTP** pour s'assurer que la requête est réussie (`status_code == 200`).
+- Enregistrer la réponse API dans un fichier local en format JSON (`json.dump`).
+
+## 2. Transformation et nettoyage des données
+### 📌 Tâches à accomplir
+- Charger le fichier `api_data.json` dans un **DataFrame Pandas**.
+- Vérifier les **valeurs manquantes** et les traiter.
+- Convertir les formats de données si nécessaire (**dates, nombres, catégories**).
+- Créer des **nouvelles colonnes** utiles pour l’analyse.
+
+### 📍 Fichier : `scripts/transform_data.py`
+
+💡 **Guides pratiques :**
+- Utiliser `pd.read_json()` pour charger les données.
+- Appliquer `df.dropna()`, `df.fillna()`, `df.astype()` pour le nettoyage.
+- Ajouter des colonnes dérivées (`df['new_col'] = df['col1'] * 1.2`).
+- Sauvegarder le DataFrame transformé dans `data/processed/clean_data.csv` avec `df.to_csv()`.
+
+## 3. Intégration dans une base de données SQLite
+### 📌 Tâches à accomplir
+- Créer une **base SQLite** et une table.
+- Insérer les données nettoyées.
+- Vérifier que les données ont bien été insérées.
+
+### 📍 Fichier : `scripts/load_to_db.py`
+
+💡 **Guides pratiques :**
+- Utiliser `sqlite3` ou `SQLAlchemy` pour gérer la base.
+- Créer une connexion avec `sqlite3.connect("data/database.db")`.
+- Charger le CSV nettoyé avec Pandas et l’insérer dans une table (`df.to_sql()`).
+
+## 4. Visualisation et analyse des données
+### 📌 Tâches à accomplir
+- Générer des **statistiques descriptives** sur les données.
+- Réaliser une **visualisation graphique** pertinente (histogrammes, courbes, heatmaps).
+- Enregistrer les figures dans `data/outputs/`.
+
+### 📍 Fichier : `scripts/visualization.py`
+
+💡 **Guides pratiques :**
+- Utiliser `df.describe()` et `df.groupby()` pour résumer les données.
+- Générer des graphiques avec `matplotlib.pyplot` et `seaborn`.
+- Enregistrer les graphiques avec `plt.savefig("data/outputs/graph.png")`.
+
+## 5. Automatisation de l’exécution du pipeline
+### 📌 Tâches à accomplir
+- Automatiser l’exécution du pipeline via **cron (Linux/Mac) ou le planificateur de tâches (Windows)**.
+- Configurer un **script de lancement** qui exécute toutes les étapes dans l’ordre.
+
+### 📍 Fichier : `run_pipeline.sh`
+
+💡 **Guides pratiques :**
+- Écrire un script Bash pour exécuter les fichiers Python dans l’ordre :
   ```sh
-  docker logs <nom_du_conteneur>
+  python scripts/extract_api.py
+  python scripts/transform_data.py
+  python scripts/load_to_db.py
+  python scripts/visualization.py
   ```
-- Testez la connexion avec un client SQL comme `pgAdmin` pour PostgreSQL ou `MySQL Workbench` pour MySQL.
-- Utilisez les volumes pour garantir la persistance des données :
+- Ajouter une tâche cron pour exécuter le script chaque jour à minuit :
   ```sh
-  docker volume create my_db_volume
+  crontab -e
+  0 0 * * * /usr/bin/python3 /chemin/vers/projet/run_pipeline.sh
   ```
+- Sur Windows, utiliser le Planificateur de tâches pour exécuter `run_pipeline.sh` à intervalles réguliers.
 
----
-
-
-## 4. Conteneurisation d’un Service de Traitement de Données
-
-### Objectif
-L’objectif de cette partie est d’apprendre à **conteneuriser un service de traitement de données** qui interagit avec la base de données créée précédemment. 
-Points clés:
-- Développer un **script Python** capable d’extraire des données depuis la base de données conteneurisée.
-- Transformer ces données et générer un **fichier de sortie** (CSV, JSON, etc.).
-- Intégrer ce service dans un conteneur Docker.
-- Configurer l’exécution de ce service de manière orchestrée avec Docker Compose.
-
----
-
-### Instructions
-
-#### 1. Développement du service de traitement de données
-- Écrire un script Python (`etl.py`) permettant de :
-  - Se connecter à la base de données via une **bibliothèque adaptée** (ex: `psycopg2` pour PostgreSQL, `mysql-connector` pour MySQL).
-  - Lire les données d’une table et les transformer (ex: filtrage, normalisation, enrichissement).
-  - Enregistrer les résultats dans un fichier (CSV, JSON).
-- Utiliser un fichier de configuration (`.env`, `config.json`) pour stocker les informations de connexion.
-
-#### 2. Conteneurisation du service
-- Définir un `Dockerfile` permettant :
-  - D’installer **Python** et les dépendances nécessaires.
-  - D’intégrer le script et ses fichiers dans un conteneur Docker.
-  - De s’assurer que le service démarre correctement à l’exécution du conteneur.
-
-#### 3. Intégration avec Docker Compose
-- Ajouter un service `etl` dans le fichier `docker-compose.yml`.
-- Vérifier que le service démarre **après** la base de données.
-- Configurer un volume si le service génère un fichier de sortie.
-
-#### 4. Test et validation
-- Lancer le service et vérifier qu’il interagit correctement avec la base de données.
-- Vérifier la présence des fichiers de sortie générés.
-- Inspecter les logs du conteneur pour identifier d’éventuelles erreurs.
-
----
-
-### Pistes et Indices
-- Consultez la documentation officielle de **Docker Hub** pour identifier l’image Python la plus adaptée.
-- Vérifiez que le service attend que la base de données soit **prête** avant d’exécuter les requêtes SQL.
-- Pour lire et écrire des fichiers dans un conteneur, pensez aux **volumes Docker**.
-- Pour éviter d’exposer les informations sensibles dans le code, utilisez un fichier `.env` et chargez les variables d’environnement.
-- Utilisez `docker-compose logs -f <nom_du_service>` pour déboguer les erreurs en temps réel.
-
----
-
-## 5. : Sécurisation et Optimisation
-
-### Objectif
-L’objectif de cette dernière partie est de **sécuriser et optimiser l’exécution des conteneurs** afin de garantir un pipeline fiable, performant et résistant aux attaques. Points clés:
-- Mettre en place des **bonnes pratiques de sécurité** pour protéger les services conteneurisés.
-- Scanner les vulnérabilités des images Docker.
-- Gérer les **secrets et accès** pour éviter l’exposition d’informations sensibles.
-- Optimiser l’utilisation des ressources pour améliorer les performances.
-
----
-
-### Instructions
-
-#### 1. Sécurisation des Conteneurs
-- Vérifier les permissions des fichiers et des utilisateurs à l’intérieur des conteneurs.
-- Restreindre l’utilisation des privilèges **root** dans les images Docker.
-- Utiliser des images minimales pour réduire la surface d’attaque.
-- Scanner les images Docker pour identifier les vulnérabilités et les paquets obsolètes.
-
-#### 2. Gestion des Secrets et Accès
-- Ne pas stocker les mots de passe et clés API directement dans le code source.
-- Utiliser des fichiers `.env` pour stocker les credentials et les injecter dans les conteneurs.
-- Explorer des solutions comme **Docker Secrets** ou **Vault** pour la gestion sécurisée des secrets.
-- Vérifier et restreindre les permissions d’accès réseau des conteneurs.
-
-#### 3. Optimisation des Performances
-- Limiter l’utilisation des ressources CPU et mémoire avec des paramètres de contrainte Docker.
-- Configurer des **volumes optimisés** pour améliorer la persistance des données.
-- Activer la mise en cache dans les `Dockerfile` pour accélérer la construction des images.
-- Analyser la consommation de ressources des conteneurs avec des outils comme `docker stats`.
-
-#### 4. Surveillance et Logging
-- Mettre en place un système de **monitoring** pour observer l’état des conteneurs.
-- Configurer des logs centralisés pour suivre les erreurs et événements anormaux.
-- Automatiser les alertes en cas d’anomalie sur les services conteneurisés.
-
----
-
-### Pistes et Indices
-- Explorez l’outil **Trivy** pour scanner les images Docker et détecter des vulnérabilités.
-- Utilisez `docker inspect <nom_du_conteneur>` pour analyser la configuration et les accès du conteneur.
-- Testez les limites de ressources avec des commandes comme :
-  ```sh
-  docker run --memory=512m --cpus=1 my_service
-  ```
-- Consultez la documentation officielle sur **Docker Secrets** et **Kubernetes Secrets** pour sécuriser les données sensibles.
-- Activez un monitoring avec **Prometheus** ou **Grafana** pour visualiser la charge des conteneurs.
-
----
-
-## 6. Conteneurisation Complète du Cycle ETL
-
-### Objectif
-L’objectif de cette partie est de **conteneuriser entièrement un pipeline de traitement de données ETL** réalisé dans le TP précédent. 
-Points clés:
-- Conteneuriser chaque étape du pipeline (extraction, transformation, chargement, visualisation).
-- Utiliser **Docker Compose** pour orchestrer l’exécution des services.
-- Assurer la persistance des données et la communication entre les services.
-- Optimiser l’exécution et garantir la sécurité du pipeline conteneurisé.
-
----
-
-### Instructions
-
-#### 1. Conteneurisation des différentes étapes
-- Chaque étape du pipeline (extraction, transformation, chargement, visualisation) doit être intégrée dans un **conteneur Docker** distinct.
-- Définir un `Dockerfile` pour chaque service avec les dépendances nécessaires.
-
-#### 2. Orchestration avec Docker Compose
-- Définir un fichier `docker-compose.yml` permettant d’orchestrer l’exécution du pipeline.
-- Configurer les dépendances entre services pour garantir une exécution correcte.
-- Définir des **volumes persistants** pour conserver les données entre les exécutions.
-
-#### 3. Optimisation et Sécurisation
-- Restreindre les accès et éviter les exécutions en mode **root**.
-- Utiliser des **réseaux Docker** pour contrôler la communication entre les services.
-- Tester le pipeline conteneurisé et optimiser son exécution.
-
----
-
-### Pistes et Indices
-- Vérifiez la connexion entre les services avec `docker network ls`.
-- Utilisez `depends_on` dans `docker-compose.yml` pour gérer les dépendances.
-- Testez chaque service individuellement avant l’exécution complète.
-
----
-
+## 🎯 Conclusion
+Vous avez construit un **pipeline de données automatisé** comprenant l’extraction, la transformation, le stockage et la visualisation de données ! Vous pouvez maintenant améliorer votre pipeline en y intégrant **des logs d'exécution**, **une gestion avancée des erreurs**, ou encore en utilisant un orchestrateur comme **Apache Airflow** ou **Dagster**. 🚀

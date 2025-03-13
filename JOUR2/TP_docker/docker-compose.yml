@@ -1,0 +1,28 @@
+services:
+
+  pipeline:
+    build: .
+    container_name: etl_pipeline
+    env_file:
+      - .env
+    depends_on:
+      - postgres_db
+    volumes:
+      - ./data:/app/data
+    restart: always
+
+  postgres_db:
+    image: postgres:14
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: etl_user
+      POSTGRES_PASSWORD: etl_password
+      POSTGRES_DB: etl_database
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+
+volumes:
+  pgdata:
