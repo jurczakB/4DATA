@@ -1,6 +1,6 @@
 # Aperçu du Projet
 
-Dans ce cours, nous allons nous concentrer sur les orchestrateurs axés sur les assets et sur la manière dont ils simplifient la gestion des pipelines de données. Vous allez utiliser **Dagster**, un orchestrateur open-source, pour construire un pipeline de données exemple.
+Dans ce TP, nous allons nous concentrer sur un orchestrateur axé sur les assets et sur la manière dont il simplifie la gestion des pipelines de données. Vous allez utiliser **Dagster**, un orchestrateur open-source, pour construire un pipeline de données exemple.
 
 À l'aide des données issues de **NYC OpenData**, vous allez créer un pipeline de données qui :
 
@@ -9,7 +9,7 @@ Dans ce cours, nous allons nous concentrer sur les orchestrateurs axés sur les 
 - **Transforme** et prépare les données pour l'analyse.
 - **Crée une visualisation** à partir des données transformées.
 
-Si vous êtes bloqué ou souhaitez avancer plus rapidement, consultez le projet finalisé disponible sur **GitHub**.
+Pour le rendu, créer une archive zip de l'ensemble du projet et déposer là dans sur Moodle dans le cadre du TP noté.
 
 ---
 
