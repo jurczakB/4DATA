@@ -1,7 +1,7 @@
 # 🚀 Projet : Implémentation d'une Pipeline de Données avec Dagster
 
 ## 📌 Objectif du Projet
-L'objectif de ce projet est de concevoir et déployer une pipeline de données **de bout en bout** en utilisant **Dagster** comme orchestrateur. Cette pipeline suivra un processus **ETL (Extract, Transform, Load) ou ELT (Extract, Load, Transform)** afin de récupérer, traiter, stocker et exploiter des données issues d'une API.
+L'objectif de ce projet est de concevoir et déployer une pipeline de données **de bout en bout** en utilisant **Dagster** comme orchestrateur. Cette pipeline suivra un processus **ELT (Extract, Load, Transform)** afin de récupérer, stocker, traiter et exploiter des données issues de l'API de votre choix.
 
 ## 📋 Cahier des Charges
 ### 🔹 1. Extraction des Données
@@ -12,6 +12,7 @@ L'objectif de ce projet est de concevoir et déployer une pipeline de données *
 - Stocker les données dans une **base de données** (PostgreSQL, DuckDB ou autre choix pertinent).
 
 ### 🔹 3. Transformation et Exploitation des Données
+- Utiliser **dbt** pour effectuer des transformations sur les données au sein du DataWarehouse
 - Réaliser des **visualisations** basiques : tableaux de bord, graphiques, etc.
 - Mettre en place des outils **d'aide à la décision** (exemple : reporting, analyse des tendances, etc.).
 - Optionnel : Intégrer un modèle de **Machine Learning ou IA** pour une analyse avancée des données.
